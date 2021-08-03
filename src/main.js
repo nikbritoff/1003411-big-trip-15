@@ -3,8 +3,9 @@ import { createSiteFilterTemplate } from './view/site-filter.js';
 import { createSiteSortingTemplate } from './view/site-sorting.js';
 import { createTripInfoTemplate } from './view/trip-info.js';
 import { createTripItemTemplate, createTripListTemplate } from './view/trip-events-list.js';
-import { createAddTripItemTemplate } from './view/add-trip-item.js';
-import { createEditTripItemTemplate } from './view/edit-trip-item.js';
+import { createAddTripEventTemplate, createEditTripEventTemplate } from './view/trip-event-form';
+
+const TRIP_EVENTS_AMOUNT = 3;
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
@@ -27,8 +28,10 @@ render(siteMainElementFilters, createSiteFilterTemplate(), 'beforeend');
 render(siteTripEvents, createSiteSortingTemplate(), 'beforeend');
 render(siteTripEvents, createTripListTemplate(), 'beforeend');
 const siteTripEventsList = siteTripEvents.querySelector('.trip-events__list');
-render(siteTripEventsList, createTripItemTemplate(), 'beforeend');
-render(siteTripEventsList, createTripItemTemplate(), 'beforeend');
-render(siteTripEventsList, createTripItemTemplate(), 'beforeend');
-render(siteTripEventsList, createAddTripItemTemplate(), 'beforeend');
-render(siteTripEventsList, createEditTripItemTemplate(), 'afterbegin');
+
+for (let i = 0; i < TRIP_EVENTS_AMOUNT; i ++) {
+  render(siteTripEventsList, createTripItemTemplate(), 'beforeend');
+}
+
+render(siteTripEventsList, createAddTripEventTemplate(), 'beforeend');
+render(siteTripEventsList, createEditTripEventTemplate(), 'afterbegin');
