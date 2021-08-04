@@ -4,6 +4,7 @@ import { createSiteSortingTemplate } from './view/site-sorting.js';
 import { createTripInfoTemplate } from './view/trip-info.js';
 import { createTripItemTemplate, createTripListTemplate } from './view/trip-events-list.js';
 import { createAddTripEventTemplate, createEditTripEventTemplate } from './view/trip-event-form';
+import { generateEvents } from './mock/event.js';
 
 const TRIP_EVENTS_AMOUNT = 3;
 
@@ -29,9 +30,13 @@ render(siteTripEvents, createSiteSortingTemplate(), 'beforeend');
 render(siteTripEvents, createTripListTemplate(), 'beforeend');
 const siteTripEventsList = siteTripEvents.querySelector('.trip-events__list');
 
+const data = generateEvents(10);
 for (let i = 0; i < TRIP_EVENTS_AMOUNT; i ++) {
-  render(siteTripEventsList, createTripItemTemplate(), 'beforeend');
+  render(siteTripEventsList, createTripItemTemplate(data[i]), 'beforeend');
 }
 
-render(siteTripEventsList, createAddTripEventTemplate(), 'beforeend');
+render(siteTripEventsList, createAddTripEventTemplate(data[2]), 'beforeend');
 render(siteTripEventsList, createEditTripEventTemplate(), 'afterbegin');
+
+
+console.log(data);
