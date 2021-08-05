@@ -6,7 +6,7 @@ import { createTripItemTemplate, createTripListTemplate } from './view/trip-even
 import { createAddTripEventTemplate, createEditTripEventTemplate } from './view/trip-event-form';
 import { generateEvents } from './mock/event.js';
 
-const TRIP_EVENTS_AMOUNT = 3;
+const TRIP_EVENTS_AMOUNT = 25;
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
@@ -30,13 +30,16 @@ render(siteTripEvents, createSiteSortingTemplate(), 'beforeend');
 render(siteTripEvents, createTripListTemplate(), 'beforeend');
 const siteTripEventsList = siteTripEvents.querySelector('.trip-events__list');
 
-const data = generateEvents(10);
-for (let i = 0; i < TRIP_EVENTS_AMOUNT; i ++) {
-  render(siteTripEventsList, createTripItemTemplate(data[i]), 'beforeend');
-}
+const data = generateEvents(TRIP_EVENTS_AMOUNT);
 
-render(siteTripEventsList, createAddTripEventTemplate(data[2]), 'beforeend');
-render(siteTripEventsList, createEditTripEventTemplate(), 'afterbegin');
-
-
-console.log(data);
+data.forEach((event,index) => {
+  if (index === 0) {
+    render(siteTripEventsList, createEditTripEventTemplate(event), 'afterbegin');
+  }
+  if (index === data.length - 1) {
+    render(siteTripEventsList, createAddTripEventTemplate(event), 'beforeend');
+  }
+  if (index !== 0 && index !== data.length - 1) {
+    render(siteTripEventsList, createTripItemTemplate(event), 'beforeend');
+  }
+});

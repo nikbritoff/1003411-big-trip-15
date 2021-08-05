@@ -14,7 +14,191 @@ const DESTINATION_INFO_DESCRIPTIONS = [
   'In rutrum ac purus sit amet tempus.',
 ];
 
+const OPTION_TITLES = {
+  taxi: {
+    options: [
+      {
+        title: 'Upgrade to comfort class',
+        price: 100,
+      },
+      {
+        title: 'Upgrade to bussines class',
+        price: 200,
+      },
+      {
+        title: 'Driver in a suit',
+        price: 300,
+      },
+      {
+        title: 'Choose the radio station',
+        price: 400,
+      },
+      {
+        title: 'White car',
+        price: 500,
+      },
+    ],
+  },
+  train: {
+    options: [
+      {
+        title: 'Select seat',
+        price: 10,
+      },
+      {
+        title: 'Warm tea or coffee',
+        price: 20,
+      },
+      {
+        title: 'Female wagon',
+        price: 30,
+      },
+      {
+        title: 'Express',
+        price: 40,
+      },
+      {
+        title: 'Shower',
+        price: 50,
+      },
+    ],
+  },
+  bus: {
+    options: [
+      {
+        title: 'Select seat',
+        price: 10,
+      },
+      {
+        title: 'Window seat',
+        price: 20,
+      },
+      {
+        title: 'Warm tea or coffee',
+        price: 30,
+      },
+      {
+        title: 'Express bus',
+        price: 40,
+      },
+      {
+        title: 'No covid sertificate',
+        price: 50,
+      },
+    ],
+  },
+  drive: {
+    options: [
+      {
+        title: 'Baby seat',
+        price: 12,
+      },
+      {
+        title: 'Full tunk',
+        price: 50,
+      },
+      {
+        title: 'Snow tyres',
+        price: 30,
+      },
+      {
+        title: 'Technical assistance',
+        price: 70,
+      },
+      {
+        title: 'Full coverage',
+        price: 250,
+      },
+    ],
+  },
+  flight: {
+    options: [
+      {
+        title: 'Upgrade to bussines class',
+        price: 50,
+      },
+      {
+        title: 'Special food',
+        price: 22,
+      },
+      {
+        title: 'Online check-in',
+        price: 35,
+      },
+      {
+        title: 'Free taxi',
+        price: 30,
+      },
+      {
+        title: 'Alcohol',
+        price: 60,
+      },
+    ],
+  },
+  restaurant: {
+    options: [
+      {
+        title: 'Live music',
+        price: 26,
+      },
+      {
+        title: 'Special menu',
+        price: 32,
+      },
+      {
+        title: 'Select table',
+        price: 55,
+      },
+      {
+        title: 'Free driver',
+        price: 30,
+      },
+      {
+        title: 'Flowers',
+        price: 10,
+      },
+    ],
+  },
+};
+  // taxi: [
+  //   'Upgrade to comfort class',
+  //   'Upgrade to bussines class',
+  //   'Driver in a suit',
+  //   'Choose the radio station',
+  //   'White car',
+  // ],
+  // bus: [
+  //   'Select seat',
+  //   'Warm tea or coffee',
+  //   'Window seat',
+  //   'Express bus',
+  //   'No covid sertificate',
+  // ],
+  // drive: [
+  //   'Full tunk',
+  //   'Full coverage',
+  //   'Technical assistance',
+  //   'Baby seat',
+  //   'Snow tyres',
+  // ],
+  // flight: [
+  //   'Upgrade to bussines class',
+  //   'Special food',
+  //   'Online check-in',
+  //   'Free taxi',
+  //   'Alcohol',
+  // ],
+  // restaurant: [
+  //   'Live music',
+  //   'Special menu',
+  //   'Select table',
+  //   'Free driver',
+  //   'Flowers',
+  // ],
+// };
+
 const generateEventType = () => {
+  // const types = ['taxi','train'];
   const types = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
   const typeIndex = getRandomIntOfRange(0, types.length);
   return types[typeIndex];
@@ -29,59 +213,15 @@ const generateEventDestination = () => {
 const generateEventOptions = (type) => {
   const options = [];
 
-  const prices = [
-    50,
-    10,
-    20,
-    200,
-    1500,
-    500,
-  ];
+  const isValidType = () => OPTION_TITLES[type] !== undefined;
 
-  const optionsTitles = {
-    taxi: [
-      'Upgrade to comfort class',
-      'Upgrade to bussines class',
-      'Driver in a suit',
-      'Choose the radio station',
-      'White car',
-    ],
-    bus: [
-      'Select seat',
-      'Warm tea or coffee',
-      'Window seat',
-      'Express bus',
-      'No codid sertificate',
-    ],
-    drive: [
-      'Full tunk',
-      'Full coverage',
-      'Technical assistance',
-      'Baby seat',
-      'Snow tyres',
-    ],
-    flight: [
-      'Upgrade to bussines class',
-      'Special food',
-      'Online check-in',
-      'Free taxi',
-      'Alcohol',
-    ],
-    restaurant: [
-      'Live music',
-      'Special menu',
-      'Select table',
-      'Free driver',
-      'Flowers',
-    ],
+  const createOption = () => {
+    const currentOption = OPTION_TITLES[type].options[getRandomIntOfRange(0, OPTION_TITLES[type].options.length)];
+    return {
+      title: currentOption.title,
+      price: currentOption.price,
+    };
   };
-
-  const isValidType = () => optionsTitles[type] !== undefined;
-
-  const createOption = () => ({
-    title: optionsTitles[type][getRandomIntOfRange(0, optionsTitles[type].length)],
-    price: prices[getRandomIntOfRange(0, prices.length)],
-  });
 
   const createOptions = (amount) => {
     for (let i = 0; i < amount; i++) {
@@ -153,4 +293,4 @@ const generateEvents = (amount) => {
   return events;
 };
 
-export {generateEvent, generateEvents};
+export {generateEvent, generateEvents, OPTION_TITLES};
