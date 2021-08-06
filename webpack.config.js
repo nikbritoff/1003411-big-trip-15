@@ -1,4 +1,5 @@
 const path = require('path');
+const dayjs = require('dayjs')
 
 module.exports = {
   entry: './src/main.js',
