@@ -41,10 +41,24 @@ const renderEvent = (eventListElement, event) => {
     eventsListComponent.getElement().replaceChild(eventItemComponent.getElement(), eventFormComponent.getElement());
   };
 
+  const onEscKeyDown = (evt) => {
+    if (evt.key === 'Esc' || evt.key === 'Escape') {
+      evt.preventDefault();
+      replaceFormToCard(evt);
+      document.removeEventListener('keydown', onEscKeyDown);
+    }
+  };
+
   // 1. Подписываемся на событие клика кнопки редактирования
-  eventItemComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => replaceItemToForm());
+  eventItemComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+    replaceItemToForm();
+    document.addEventListener('keydown', onEscKeyDown);
+  });
   // 2. Подписываемся на событие отправки формы редактирования
-  eventFormComponent.getElement().querySelector('.event--edit').addEventListener('submit', (evt) => replaceFormToCard(evt));
+  eventFormComponent.getElement().querySelector('.event--edit').addEventListener('submit', (evt) => {
+    replaceFormToCard(evt);
+    document.removeEventListener('keydown', onEscKeyDown);
+  });
 
   render(eventListElement, eventItemComponent.getElement(), RenderPosition.BEFOREEND);
 
