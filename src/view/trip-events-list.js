@@ -1,18 +1,20 @@
+import dayjs from 'dayjs';
+
 const createTripListTemplate = () => (
   `<ul class="trip-events__list">
   </ul>`
 );
 
 const createTripItemTemplate = (data) => {
-  const {type, destination, options, basePrice, isFavorite, dateFrom, dateTo} = data;
+  const {type, options, destination, basePrice, isFavorite, dateFrom, dateTo} = data;
+  const destinationName = destination.name;
 
   const createTripItemOffersList = () => {
-    let list = '';
     let offers = '';
     if (options.length > 0) {
       options.forEach((option) => {
-        offers = `${offers}
-        <li class="event__offer">
+        offers +=
+        `<li class="event__offer">
           <span class="event__offer-title">${option.title}</span>
           &plus;&euro;&nbsp;
           <span class="event__offer-price">${option.price}</span>
@@ -20,9 +22,7 @@ const createTripItemTemplate = (data) => {
       });
     }
 
-    list = `<ul class="event__selected-offers">${offers}</ul>`;
-
-    return list;
+    return `<ul class="event__selected-offers">${offers}</ul>`;
   };
 
   const getFullEventPrice = () => {
@@ -32,22 +32,25 @@ const createTripItemTemplate = (data) => {
 
   const setEventFavoriteStatus = () => isFavorite ? 'event__favorite-btn--active' : '';
 
-  const getEventDuration = () => dateTo.diff(dateFrom, 'minute');
+  const getEventDuration = (start, end) => {
+    const duration = dayjs(end).diff(start, 'minute');
+    return duration;
+  };
 
   return `<li class="trip-events__item">
   <div class="event">
-    <time class="event__date" datetime="${dateFrom.format('YYYY-MM-DD')}">${dateFrom.format('MMM DD')}</time>
+    <time class="event__date" datetime="${dayjs(dateFrom).format('YYYY-MM-DD')}">${dayjs(dateFrom).format('DD MMM')}</time>
     <div class="event__type">
       <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
     </div>
-    <h3 class="event__title">${type} ${destination}</h3>
+    <h3 class="event__title">${type} ${destinationName}</h3>
     <div class="event__schedule">
       <p class="event__time">
-        <time class="event__start-time" datetime="${dateFrom.format('YYYY-MM-DD')}T${dateFrom.format('HH:mm')}">${dateFrom.format('HH:mm')}</time>
+      <time class="event__start-time" datetime="${dayjs(dateFrom).format('YYYY-MM-DDTHH:MM')}">${dayjs(dateFrom).format('HH:MM')}</time>
         &mdash;
-        <time class="event__end-time" datetime="${dateTo.format('YYYY-MM-DD')}T${dateTo.format('HH:mm')}">${dateTo.format('HH:mm')}</time>
+        <time class="event__end-time" datetime="${dayjs(dateTo).format('YYYY-MM-DDTHH:MM')}">${dayjs(dateTo).format('HH:MM')}</time>
       </p>
-      <p class="event__duration">${getEventDuration()}M</p>
+      <p class="event__duration">${getEventDuration(dateFrom, dateTo)}M</p>
     </div>
     <p class="event__price">
       &euro;&nbsp;<span class="event__price-value">${getFullEventPrice()}</span>

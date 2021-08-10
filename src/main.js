@@ -3,10 +3,14 @@ import { createSiteFilterTemplate } from './view/site-filter.js';
 import { createSiteSortingTemplate } from './view/site-sorting.js';
 import { createTripInfoTemplate } from './view/trip-info.js';
 import { createTripItemTemplate, createTripListTemplate } from './view/trip-events-list.js';
-import { createAddTripEventTemplate, createEditTripEventTemplate } from './view/trip-event-form';
+import { createEventFormTemplate } from './view/trip-event-form';
 import { generateEvents } from './mock/event.js';
 
 const TRIP_EVENTS_AMOUNT = 25;
+const ADD_FORM_BUTTON_RESET_TEXT = 'Cancel';
+const EDIT_FORM_BUTTON_RESET_TEXT ='Delete';
+
+const data = generateEvents(TRIP_EVENTS_AMOUNT);
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
@@ -21,7 +25,7 @@ const siteMainElement = document.querySelector('.page-main');
 const siteTripEvents = siteMainElement.querySelector('.trip-events');
 
 // Отрисовка хэдера
-render(siteTripMainElement, createTripInfoTemplate(), 'afterbegin');
+render(siteTripMainElement, createTripInfoTemplate(data), 'afterbegin');
 render(siteMainElementNavigation, createSiteMenuTemplate(), 'beforeend');
 render(siteMainElementFilters, createSiteFilterTemplate(), 'beforeend');
 
@@ -30,16 +34,14 @@ render(siteTripEvents, createSiteSortingTemplate(), 'beforeend');
 render(siteTripEvents, createTripListTemplate(), 'beforeend');
 const siteTripEventsList = siteTripEvents.querySelector('.trip-events__list');
 
-const data = generateEvents(TRIP_EVENTS_AMOUNT);
-
 data.forEach((event,index) => {
   if (index === 0) {
-    render(siteTripEventsList, createEditTripEventTemplate(event), 'afterbegin');
+    render(siteTripEventsList, createEventFormTemplate(event, EDIT_FORM_BUTTON_RESET_TEXT), 'afterbegin');
+    return;
   }
   if (index === data.length - 1) {
-    render(siteTripEventsList, createAddTripEventTemplate(event), 'beforeend');
+    render(siteTripEventsList, createEventFormTemplate(event, ADD_FORM_BUTTON_RESET_TEXT), 'beforeend');
+    return;
   }
-  if (index !== 0 && index !== data.length - 1) {
-    render(siteTripEventsList, createTripItemTemplate(event), 'beforeend');
-  }
+  render(siteTripEventsList, createTripItemTemplate(event), 'beforeend');
 });
