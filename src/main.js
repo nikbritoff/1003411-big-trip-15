@@ -6,11 +6,17 @@ import SiteEventsListView from './view/trip-events-list.js';
 import TripEventItemView from './view/trip-event-item.js';
 import TripEventFormView from './view/trip-event-form';
 import { generateEvents } from './mock/event.js';
-import { RenderPosition, renderElement } from './utils.js';
+import { RenderPosition, render } from './utils.js';
 
 const TRIP_EVENTS_AMOUNT = 25;
-const ADD_FORM_BUTTON_RESET_TEXT = 'Cancel';
-const EDIT_FORM_BUTTON_RESET_TEXT ='Delete';
+
+const EVENT_FORM_BUTTON_RESET_TEXT = {
+  edit: 'Delete',
+  cancel: 'Cancel',
+};
+
+// const ADD_FORM_BUTTON_RESET_TEXT = 'Cancel';
+// const EDIT_FORM_BUTTON_RESET_TEXT ='Delete';
 
 const data = generateEvents(TRIP_EVENTS_AMOUNT);
 
@@ -20,26 +26,40 @@ const siteMainElementNavigation = siteMainElementControls.querySelector('.trip-c
 const siteMainElementFilters = siteMainElementControls.querySelector('.trip-controls__filters');
 const siteMainElement = document.querySelector('.page-main');
 const siteTripEvents = siteMainElement.querySelector('.trip-events');
+const eventsListComponent = new SiteEventsListView();
+
+const renderEvent = (eventListElement, event) => {
+  const eventItemComponent = new TripEventItemView(event);
+  const eventFormComponent = new TripEventFormView(event, EVENT_FORM_BUTTON_RESET_TEXT.edit);
+
+  const replaceItemToForm = () => {
+    eventsListComponent.getElement().replaceChild(eventFormComponent.getElement(), eventItemComponent.getElement());
+  };
+
+  const replaceFormToCard = (evt) => {
+    evt.preventDefault();
+    eventsListComponent.getElement().replaceChild(eventItemComponent.getElement(), eventFormComponent.getElement());
+  };
+
+  // 1. Подписываемся на событие клика кнопки редактирования
+  eventItemComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => replaceItemToForm());
+  // 2. Подписываемся на событие отправки формы редактирования
+  eventFormComponent.getElement().querySelector('.event--edit').addEventListener('submit', (evt) => replaceFormToCard(evt));
+
+  render(eventListElement, eventItemComponent.getElement(), RenderPosition.BEFOREEND);
+
+
+};
 
 // Отрисовка хэдера
-renderElement(siteTripMainElement, new TripInfoView(data).getElement(), RenderPosition.AFTERBEGIN);
-renderElement(siteMainElementNavigation, new SiteMenuView().getElement(), RenderPosition.BEFOREEND);
-renderElement(siteMainElementFilters, new SiteFilterView().getElement(), RenderPosition.BEFOREEND);
+render(siteTripMainElement, new TripInfoView(data).getElement(), RenderPosition.AFTERBEGIN);
+render(siteMainElementNavigation, new SiteMenuView().getElement(), RenderPosition.BEFOREEND);
+render(siteMainElementFilters, new SiteFilterView().getElement(), RenderPosition.BEFOREEND);
 
 // Отрисовка main
-renderElement(siteTripEvents, new SiteSortingView().getElement(), RenderPosition.BEFOREEND);
-const eventsListComponent = new SiteEventsListView();
-renderElement(siteTripEvents, eventsListComponent.getElement(), RenderPosition.BEFOREEND);
+render(siteTripEvents, new SiteSortingView().getElement(), RenderPosition.BEFOREEND);
+render(siteTripEvents, eventsListComponent.getElement(), RenderPosition.BEFOREEND);
 
-data.forEach((event,index) => {
-  if (index === 0) {
-    renderElement(eventsListComponent.getElement(), new TripEventFormView(event, EDIT_FORM_BUTTON_RESET_TEXT).getElement(), RenderPosition.BEFOREEND);
-    return;
-  }
-  if (index === data.length - 1) {
-    renderElement(eventsListComponent.getElement(), new TripEventFormView(event, ADD_FORM_BUTTON_RESET_TEXT).getElement(), RenderPosition.BEFOREEND);
-    return;
-  }
-
-  renderElement(eventsListComponent.getElement(), new TripEventItemView(event).getElement(), RenderPosition.BEFOREEND);
+data.forEach((event) => {
+  renderEvent(eventsListComponent.getElement(), event);
 });
