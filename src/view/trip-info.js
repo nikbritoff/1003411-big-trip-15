@@ -61,5 +61,3 @@ export default class TripInfo {
     this._element = null;
   }
 }
-
-// export {createTripInfoTemplate};

@@ -43,5 +43,3 @@ export default class SiteFilter {
     this._element = null;
   }
 }
-
-// export {createSiteFilterTemplate};
