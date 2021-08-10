@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { EVENT_DESTINATION_NAMES } from '../mock/event';
+import { createElement } from '../utils';
 
 const setOptions = (options) => {
   let avialableOptins = '';
@@ -160,4 +161,28 @@ const createEventFormTemplate = (data, resetButtonText) => {
 </li>`;
 };
 
-export {createEventFormTemplate};
+export default class TripEventForm{
+  constructor(data, resetButtonText) {
+    this._data = data;
+    this._resetButtonText = resetButtonText;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEventFormTemplate(this._data, this._resetButtonText);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+// export {createEventFormTemplate};

@@ -1,11 +1,12 @@
 import SiteMenuView from './view/site-menu.js';
 import SiteFilterView from './view/site-filter.js';
-import { createSiteSortingTemplate } from './view/site-sorting.js';
-import { createTripInfoTemplate } from './view/trip-info.js';
-import { createTripItemTemplate, createTripListTemplate } from './view/trip-events-list.js';
-import { createEventFormTemplate } from './view/trip-event-form';
+import SiteSortingView from './view/site-sorting.js';
+import TripInfoView from './view/trip-info.js';
+import SiteEventsListView from './view/trip-events-list.js';
+import TripEventItemView from './view/trip-event-item.js';
+import TripEventFormView from './view/trip-event-form';
 import { generateEvents } from './mock/event.js';
-import { renderTemplate, RenderPosition, renderElement } from './utils.js';
+import { RenderPosition, renderElement } from './utils.js';
 
 const TRIP_EVENTS_AMOUNT = 25;
 const ADD_FORM_BUTTON_RESET_TEXT = 'Cancel';
@@ -21,23 +22,24 @@ const siteMainElement = document.querySelector('.page-main');
 const siteTripEvents = siteMainElement.querySelector('.trip-events');
 
 // Отрисовка хэдера
-renderTemplate(siteTripMainElement, createTripInfoTemplate(data), 'afterbegin');
+renderElement(siteTripMainElement, new TripInfoView(data).getElement(), RenderPosition.AFTERBEGIN);
 renderElement(siteMainElementNavigation, new SiteMenuView().getElement(), RenderPosition.BEFOREEND);
 renderElement(siteMainElementFilters, new SiteFilterView().getElement(), RenderPosition.BEFOREEND);
 
 // Отрисовка main
-renderTemplate(siteTripEvents, createSiteSortingTemplate(), 'beforeend');
-renderTemplate(siteTripEvents, createTripListTemplate(), 'beforeend');
-const siteTripEventsList = siteTripEvents.querySelector('.trip-events__list');
+renderElement(siteTripEvents, new SiteSortingView().getElement(), RenderPosition.BEFOREEND);
+const eventsListComponent = new SiteEventsListView();
+renderElement(siteTripEvents, eventsListComponent.getElement(), RenderPosition.BEFOREEND);
 
 data.forEach((event,index) => {
   if (index === 0) {
-    renderTemplate(siteTripEventsList, createEventFormTemplate(event, EDIT_FORM_BUTTON_RESET_TEXT), 'afterbegin');
+    renderElement(eventsListComponent.getElement(), new TripEventFormView(event, EDIT_FORM_BUTTON_RESET_TEXT).getElement(), RenderPosition.BEFOREEND);
     return;
   }
   if (index === data.length - 1) {
-    renderTemplate(siteTripEventsList, createEventFormTemplate(event, ADD_FORM_BUTTON_RESET_TEXT), 'beforeend');
+    renderElement(eventsListComponent.getElement(), new TripEventFormView(event, ADD_FORM_BUTTON_RESET_TEXT).getElement(), RenderPosition.BEFOREEND);
     return;
   }
-  renderTemplate(siteTripEventsList, createTripItemTemplate(event), 'beforeend');
+
+  renderElement(eventsListComponent.getElement(), new TripEventItemView(event).getElement(), RenderPosition.BEFOREEND);
 });

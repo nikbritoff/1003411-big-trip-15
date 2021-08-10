@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { createElement } from '../utils';
 
 const setRouteName = (data) => {
   let route = '';
@@ -38,4 +39,27 @@ const createTripInfoTemplate = (data) => (
   </section>`
 );
 
-export {createTripInfoTemplate};
+export default class TripInfo {
+  constructor(data) {
+    this._data = data;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+// export {createTripInfoTemplate};
