@@ -4,11 +4,11 @@ import { createElement } from '../utils';
 
 const setOptions = (options) => {
   let avialableOptins = '';
-  options.forEach((currentOption) => {
+  options.forEach((currentOption, index) => {
     avialableOptins += `
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" ${currentOption.isChecked ? 'checked' : ''}>
-      <label class="event__offer-label" for="event-offer-comfort-1">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-${index}" type="checkbox" name="event-offer-comfort" ${currentOption.isChecked ? 'checked' : ''}>
+      <label class="event__offer-label" for="event-offer-comfort-${index}">
         <span class="event__offer-title">${currentOption.title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${currentOption.price}</span>
@@ -184,5 +184,3 @@ export default class TripEventForm{
     this._element = null;
   }
 }
-
-// export {createEventFormTemplate};

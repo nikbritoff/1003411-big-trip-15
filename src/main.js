@@ -4,7 +4,8 @@ import SiteSortingView from './view/site-sorting.js';
 import TripInfoView from './view/trip-info.js';
 import SiteEventsListView from './view/trip-events-list.js';
 import TripEventItemView from './view/trip-event-item.js';
-import TripEventFormView from './view/trip-event-form';
+import TripEventFormView from './view/trip-event-form.js';
+import NoEventView from './view/no-events.js';
 import { generateEvents } from './mock/event.js';
 import { RenderPosition, render } from './utils.js';
 
@@ -14,9 +15,6 @@ const EVENT_FORM_BUTTON_RESET_TEXT = {
   edit: 'Delete',
   cancel: 'Cancel',
 };
-
-// const ADD_FORM_BUTTON_RESET_TEXT = 'Cancel';
-// const EDIT_FORM_BUTTON_RESET_TEXT ='Delete';
 
 const data = generateEvents(TRIP_EVENTS_AMOUNT);
 
@@ -41,14 +39,26 @@ const renderEvent = (eventListElement, event) => {
     eventsListComponent.getElement().replaceChild(eventItemComponent.getElement(), eventFormComponent.getElement());
   };
 
+  const onEscKeyDown = (evt) => {
+    if (evt.key === 'Esc' || evt.key === 'Escape') {
+      evt.preventDefault();
+      replaceFormToCard(evt);
+      document.removeEventListener('keydown', onEscKeyDown);
+    }
+  };
+
   // 1. Подписываемся на событие клика кнопки редактирования
-  eventItemComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => replaceItemToForm());
+  eventItemComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+    replaceItemToForm();
+    document.addEventListener('keydown', onEscKeyDown);
+  });
   // 2. Подписываемся на событие отправки формы редактирования
-  eventFormComponent.getElement().querySelector('.event--edit').addEventListener('submit', (evt) => replaceFormToCard(evt));
+  eventFormComponent.getElement().querySelector('.event--edit').addEventListener('submit', (evt) => {
+    replaceFormToCard(evt);
+    document.removeEventListener('keydown', onEscKeyDown);
+  });
 
   render(eventListElement, eventItemComponent.getElement(), RenderPosition.BEFOREEND);
-
-
 };
 
 // Отрисовка хэдера
@@ -58,8 +68,12 @@ render(siteMainElementFilters, new SiteFilterView().getElement(), RenderPosition
 
 // Отрисовка main
 render(siteTripEvents, new SiteSortingView().getElement(), RenderPosition.BEFOREEND);
-render(siteTripEvents, eventsListComponent.getElement(), RenderPosition.BEFOREEND);
 
-data.forEach((event) => {
-  renderEvent(eventsListComponent.getElement(), event);
-});
+if (data.length === 0) {
+  render(siteTripEvents, new NoEventView().getElement(), RenderPosition.BEFOREEND);
+} else {
+  render(siteTripEvents, eventsListComponent.getElement(), RenderPosition.BEFOREEND);
+  data.forEach((event) => {
+    renderEvent(eventsListComponent.getElement(), event);
+  });
+}

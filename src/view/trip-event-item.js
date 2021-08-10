@@ -88,5 +88,3 @@ export default class TripEventItem {
     this._element = null;
   }
 }
-
-// export {createTripItemTemplate};
