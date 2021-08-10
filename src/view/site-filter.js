@@ -1,3 +1,5 @@
+import { createElement } from '../utils';
+
 const createSiteFilterTemplate = () => (
   `
   <form class="trip-filters" action="#" method="get">
@@ -20,4 +22,26 @@ const createSiteFilterTemplate = () => (
   </form>`
 );
 
-export {createSiteFilterTemplate};
+export default class SiteFilter {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createSiteFilterTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+// export {createSiteFilterTemplate};

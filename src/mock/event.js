@@ -1,6 +1,8 @@
 import { getRandomIntOfRange } from './utils';
 import dayjs from 'dayjs';
 
+const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+const EVENT_DESTINATION_NAMES = ['Rome', 'New York', 'Moscow', 'Tokyo', 'Paris', 'Stockholm', 'Oslo', 'Berlin', 'Prague'];
 const DESTINATION_INFO_DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget.',
   'Fusce tristique felis at fermentum pharetra.',
@@ -13,6 +15,13 @@ const DESTINATION_INFO_DESCRIPTIONS = [
   'Nunc fermentum tortor ac porta dapibus.',
   'In rutrum ac purus sit amet tempus.',
 ];
+const PICTURE_DESCRIPTIONS = [
+  'Best place I have seen',
+  'I shoud see this!',
+  'What a lovely shoot',
+  'Great!',
+  'Modern style',
+];
 
 const OPTION_TITLES = {
   taxi: {
@@ -20,22 +29,27 @@ const OPTION_TITLES = {
       {
         title: 'Upgrade to comfort class',
         price: 100,
+        isChecked: true,
       },
       {
         title: 'Upgrade to bussines class',
         price: 200,
+        isChecked: false,
       },
       {
         title: 'Driver in a suit',
         price: 300,
+        isChecked: true,
       },
       {
         title: 'Choose the radio station',
         price: 400,
+        isChecked: false,
       },
       {
         title: 'White car',
         price: 500,
+        isChecked: true,
       },
     ],
   },
@@ -44,22 +58,27 @@ const OPTION_TITLES = {
       {
         title: 'Select seat',
         price: 10,
+        isChecked: true,
       },
       {
         title: 'Warm tea or coffee',
         price: 20,
+        isChecked: true,
       },
       {
         title: 'Female wagon',
         price: 30,
+        isChecked: false,
       },
       {
         title: 'Express',
         price: 40,
+        isChecked: false,
       },
       {
         title: 'Shower',
         price: 50,
+        isChecked: true,
       },
     ],
   },
@@ -68,22 +87,27 @@ const OPTION_TITLES = {
       {
         title: 'Select seat',
         price: 10,
+        isChecked: true,
       },
       {
         title: 'Window seat',
         price: 20,
+        isChecked: true,
       },
       {
         title: 'Warm tea or coffee',
         price: 30,
+        isChecked: false,
       },
       {
         title: 'Express bus',
         price: 40,
+        isChecked: false,
       },
       {
         title: 'No covid sertificate',
         price: 50,
+        isChecked: true,
       },
     ],
   },
@@ -92,22 +116,27 @@ const OPTION_TITLES = {
       {
         title: 'Baby seat',
         price: 12,
+        isChecked: true,
       },
       {
         title: 'Full tunk',
         price: 50,
+        isChecked: true,
       },
       {
         title: 'Snow tyres',
         price: 30,
+        isChecked: false,
       },
       {
         title: 'Technical assistance',
         price: 70,
+        isChecked: false,
       },
       {
         title: 'Full coverage',
         price: 250,
+        isChecked: true,
       },
     ],
   },
@@ -116,22 +145,27 @@ const OPTION_TITLES = {
       {
         title: 'Upgrade to bussines class',
         price: 50,
+        isChecked: true,
       },
       {
         title: 'Special food',
         price: 22,
+        isChecked: true,
       },
       {
         title: 'Online check-in',
         price: 35,
+        isChecked: true,
       },
       {
         title: 'Free taxi',
         price: 30,
+        isChecked: false,
       },
       {
         title: 'Alcohol',
         price: 60,
+        isChecked: false,
       },
     ],
   },
@@ -140,104 +174,61 @@ const OPTION_TITLES = {
       {
         title: 'Live music',
         price: 26,
+        isChecked: false,
       },
       {
         title: 'Special menu',
         price: 32,
+        isChecked: true,
       },
       {
         title: 'Select table',
         price: 55,
+        isChecked: false,
       },
       {
         title: 'Free driver',
         price: 30,
+        isChecked: false,
       },
       {
         title: 'Flowers',
         price: 10,
+        isChecked: false,
       },
     ],
   },
 };
-  // taxi: [
-  //   'Upgrade to comfort class',
-  //   'Upgrade to bussines class',
-  //   'Driver in a suit',
-  //   'Choose the radio station',
-  //   'White car',
-  // ],
-  // bus: [
-  //   'Select seat',
-  //   'Warm tea or coffee',
-  //   'Window seat',
-  //   'Express bus',
-  //   'No covid sertificate',
-  // ],
-  // drive: [
-  //   'Full tunk',
-  //   'Full coverage',
-  //   'Technical assistance',
-  //   'Baby seat',
-  //   'Snow tyres',
-  // ],
-  // flight: [
-  //   'Upgrade to bussines class',
-  //   'Special food',
-  //   'Online check-in',
-  //   'Free taxi',
-  //   'Alcohol',
-  // ],
-  // restaurant: [
-  //   'Live music',
-  //   'Special menu',
-  //   'Select table',
-  //   'Free driver',
-  //   'Flowers',
-  // ],
-// };
 
 const generateEventType = () => {
-  // const types = ['taxi','train'];
-  const types = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-  const typeIndex = getRandomIntOfRange(0, types.length);
-  return types[typeIndex];
+  const typeIndex = getRandomIntOfRange(0, EVENT_TYPES.length);
+  return EVENT_TYPES[typeIndex];
 };
 
-const generateEventDestination = () => {
-  const cities = ['Rome', 'New York', 'Moscow', 'Tokyo', 'Paris', 'Stockholm', 'Oslo', 'Berlin ', 'Prague'];
-  const cityIndex = getRandomIntOfRange(0, cities.length);
-  return cities[cityIndex];
+const generateEventDestinationName = () => {
+  const cityIndex = getRandomIntOfRange(0, EVENT_DESTINATION_NAMES.length);
+  return EVENT_DESTINATION_NAMES[cityIndex];
 };
 
 const generateEventOptions = (type) => {
   const options = [];
 
-  const isValidType = () => OPTION_TITLES[type] !== undefined;
-
-  const createOption = () => {
-    const currentOption = OPTION_TITLES[type].options[getRandomIntOfRange(0, OPTION_TITLES[type].options.length)];
-    return {
-      title: currentOption.title,
-      price: currentOption.price,
-    };
-  };
-
-  const createOptions = (amount) => {
-    for (let i = 0; i < amount; i++) {
-      options.push(createOption());
-    }
-  };
-
-  if (isValidType()) {
+  if (OPTION_TITLES[type] !== undefined) {
     const optionsAmount = getRandomIntOfRange(2, 6);
-    createOptions(optionsAmount);
+    for (let i = 0; i < optionsAmount; i++) {
+      const currentOption = OPTION_TITLES[type].options[getRandomIntOfRange(0, OPTION_TITLES[type].options.length)];
+      options.push({
+        title: currentOption.title,
+        price: currentOption.price,
+        isChecked: currentOption.isChecked,
+      });
+    }
   }
 
   return options;
 };
 
-const generateEventDescription = () => {
+const generateEventDestinationDescription = () => {
   const sentenciesAmout = getRandomIntOfRange(1, 6);
   let description = '';
 
@@ -248,41 +239,36 @@ const generateEventDescription = () => {
   return description;
 };
 
-const generateEventPitures = () => {
-  const photoDescriptions = [
-    'Best place I have seen',
-    'I shoud see this!',
-    'What a lovely shoot',
-    'Great!',
-    'Modern style',
-  ];
+const generateEventDestinationPitures = () => {
   const picturesAmount = getRandomIntOfRange(0, 10);
   const pictures = new Array(picturesAmount).fill('').map(() => ({
     src: `http://picsum.photos/248/152?r=${getRandomIntOfRange(1, 25)}`,
-    description: photoDescriptions[getRandomIntOfRange(0, photoDescriptions.length)],
+    description: PICTURE_DESCRIPTIONS[getRandomIntOfRange(0, PICTURE_DESCRIPTIONS.length)],
   }));
   return pictures;
 };
 
 const generateDateFrom = () => {
   const now = dayjs();
-  const eventDate = now.add(getRandomIntOfRange(3, 3000), 'hour');
+  const eventDate = now.add(getRandomIntOfRange(3, 3000), 'hour').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
   return eventDate;
 };
 
 const generateEvent = () => {
   const eventPoint = {
     type: generateEventType(),
-    destination: generateEventDestination(),
-    description: generateEventDescription(),
+    destination: {
+      name: generateEventDestinationName(),
+      description: generateEventDestinationDescription(),
+      pictures: generateEventDestinationPitures(),
+    },
     basePrice: getRandomIntOfRange(0, 3000),
     isFavorite: Boolean(getRandomIntOfRange(0, 2)),
-    pictures: generateEventPitures(),
     dateFrom: generateDateFrom(),
   };
 
   eventPoint.options = generateEventOptions(eventPoint.type);
-  eventPoint.dateTo = eventPoint.dateFrom.add(getRandomIntOfRange(1, 300), 'minute');
+  eventPoint.dateTo = dayjs(eventPoint.dateFrom).add(getRandomIntOfRange(1, 300), 'minute').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
   return eventPoint;
 };
@@ -293,4 +279,4 @@ const generateEvents = (amount) => {
   return events;
 };
 
-export {generateEvent, generateEvents, OPTION_TITLES};
+export {generateEvent, generateEvents, OPTION_TITLES, EVENT_DESTINATION_NAMES};
