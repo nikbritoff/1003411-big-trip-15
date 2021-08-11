@@ -7,7 +7,7 @@ import TripEventItemView from './view/trip-event-item.js';
 import TripEventFormView from './view/trip-event-form.js';
 import NoEventView from './view/no-events.js';
 import { generateEvents } from './mock/event.js';
-import { RenderPosition, render } from './utils.js';
+import { RenderPosition, render, replace } from './utils/render.js';
 
 const TRIP_EVENTS_AMOUNT = 25;
 
@@ -31,12 +31,11 @@ const renderEvent = (eventListElement, event) => {
   const eventFormComponent = new TripEventFormView(event, EVENT_FORM_BUTTON_RESET_TEXT.edit);
 
   const replaceItemToForm = () => {
-    eventsListComponent.getElement().replaceChild(eventFormComponent.getElement(), eventItemComponent.getElement());
+    replace(eventFormComponent, eventItemComponent);
   };
 
-  const replaceFormToCard = (evt) => {
-    evt.preventDefault();
-    eventsListComponent.getElement().replaceChild(eventItemComponent.getElement(), eventFormComponent.getElement());
+  const replaceFormToCard = () => {
+    replace(eventItemComponent, eventFormComponent);
   };
 
   const onEscKeyDown = (evt) => {
@@ -48,13 +47,14 @@ const renderEvent = (eventListElement, event) => {
   };
 
   // 1. Подписываемся на событие клика кнопки редактирования
-  eventItemComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  eventItemComponent.setEditClickHandler(() => {
     replaceItemToForm();
     document.addEventListener('keydown', onEscKeyDown);
   });
+
   // 2. Подписываемся на событие отправки формы редактирования
-  eventFormComponent.getElement().querySelector('.event--edit').addEventListener('submit', (evt) => {
-    replaceFormToCard(evt);
+  eventFormComponent.setSubmitHandler(() => {
+    replaceFormToCard();
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
@@ -62,18 +62,18 @@ const renderEvent = (eventListElement, event) => {
 };
 
 // Отрисовка хэдера
-render(siteTripMainElement, new TripInfoView(data).getElement(), RenderPosition.AFTERBEGIN);
-render(siteMainElementNavigation, new SiteMenuView().getElement(), RenderPosition.BEFOREEND);
-render(siteMainElementFilters, new SiteFilterView().getElement(), RenderPosition.BEFOREEND);
+render(siteTripMainElement, new TripInfoView(data), RenderPosition.AFTERBEGIN);
+render(siteMainElementNavigation, new SiteMenuView(), RenderPosition.BEFOREEND);
+render(siteMainElementFilters, new SiteFilterView(), RenderPosition.BEFOREEND);
 
 // Отрисовка main
-render(siteTripEvents, new SiteSortingView().getElement(), RenderPosition.BEFOREEND);
+render(siteTripEvents, new SiteSortingView(), RenderPosition.BEFOREEND);
 
 if (data.length === 0) {
-  render(siteTripEvents, new NoEventView().getElement(), RenderPosition.BEFOREEND);
+  render(siteTripEvents, new NoEventView(), RenderPosition.BEFOREEND);
 } else {
-  render(siteTripEvents, eventsListComponent.getElement(), RenderPosition.BEFOREEND);
+  render(siteTripEvents, eventsListComponent, RenderPosition.BEFOREEND);
   data.forEach((event) => {
-    renderEvent(eventsListComponent.getElement(), event);
+    renderEvent(eventsListComponent, event);
   });
 }

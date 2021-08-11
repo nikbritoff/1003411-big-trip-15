@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { createElement } from '../utils';
+import AbstractView from './abstract';
 
 const setRouteName = (data) => {
   let route = '';
@@ -39,25 +39,13 @@ const createTripInfoTemplate = (data) => (
   </section>`
 );
 
-export default class TripInfo {
+export default class TripInfo extends AbstractView {
   constructor(data) {
+    super();
     this._data = data;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripInfoTemplate(this._data);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
