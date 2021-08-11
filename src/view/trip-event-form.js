@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { EVENT_DESTINATION_NAMES } from '../mock/event';
-import { createElement } from '../utils';
+import AbstractView from './abstract';
 
 const setOptions = (options) => {
   let avialableOptins = '';
@@ -161,26 +161,25 @@ const createEventFormTemplate = (data, resetButtonText) => {
 </li>`;
 };
 
-export default class TripEventForm{
+export default class TripEventForm extends AbstractView{
   constructor(data, resetButtonText) {
+    super();
     this._data = data;
     this._resetButtonText = resetButtonText;
-    this._element = null;
+    this._editSubmitHandler = this._editSubmitHandler.bind(this);
   }
 
   getTemplate() {
     return createEventFormTemplate(this._data, this._resetButtonText);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _editSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.editSubmit();
   }
 
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(callback) {
+    this._callback.editSubmit = callback;
+    this.getElement().querySelector('.event--edit').addEventListener('submit', this._editSubmitHandler);
   }
 }
