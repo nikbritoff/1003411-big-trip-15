@@ -1,5 +1,6 @@
 import { getRandomIntOfRange } from './utils';
 import dayjs from 'dayjs';
+import { nanoid } from 'nanoid';
 
 const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 const EVENT_DESTINATION_NAMES = ['Rome', 'New York', 'Moscow', 'Tokyo', 'Paris', 'Stockholm', 'Oslo', 'Berlin', 'Prague'];
@@ -262,6 +263,7 @@ const generateEvent = () => {
       description: generateEventDestinationDescription(),
       pictures: generateEventDestinationPitures(),
     },
+    id: nanoid(),
     basePrice: getRandomIntOfRange(0, 3000),
     isFavorite: Boolean(getRandomIntOfRange(0, 2)),
     dateFrom: generateDateFrom(),
