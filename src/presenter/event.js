@@ -122,6 +122,7 @@ export default class Event {
     this._changeEventPrice();
     this._changeEventDate();
     this._changeData(event);
+    document.removeEventListener('keydown', this._escKeyDownHandler);
     this._replaceFormToItem();
   }
 }
