@@ -119,7 +119,7 @@ const createEventFormTemplate = (data, resetButtonText) => {
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          Flight
+          ${type}
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="" list="destination-list-1">
         ${setDestinationList(EVENT_DESTINATION_NAMES)}
@@ -180,6 +180,6 @@ export default class TripEventForm extends AbstractView{
 
   setSubmitHandler(callback) {
     this._callback.editSubmit = callback;
-    this.getElement().querySelector('.event--edit').addEventListener('submit', this._editSubmitHandler);
+    this.getElement().addEventListener('submit', this._editSubmitHandler);
   }
 }

@@ -9,12 +9,14 @@ const createTripItemTemplate = (data) => {
     let offers = '';
     if (options.length > 0) {
       options.forEach((option) => {
-        offers +=
+        if (option.isChecked) {
+          offers +=
         `<li class="event__offer">
           <span class="event__offer-title">${option.title}</span>
           &plus;&euro;&nbsp;
           <span class="event__offer-price">${option.price}</span>
         </li>`;
+        }
       });
     }
 
