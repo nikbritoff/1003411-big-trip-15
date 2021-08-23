@@ -1,16 +1,17 @@
 import TripEventItemView from '../view/trip-event-item.js';
 import TripEventFormView from '../view/trip-event-form.js';
+import { EVENT_FORM_MODE, MODE } from '../utils/const.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
 
-const EVENT_FORM_BUTTON_RESET_TEXT = {
-  edit: 'Delete',
-  cancel: 'Cancel',
-};
+// const EVENT_FORM_BUTTON_RESET_TEXT = {
+//   edit: 'Delete',
+//   cancel: 'Cancel',
+// };
 
-const MODE = {
-  DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING',
-};
+// const MODE = {
+//   DEFAULT: 'DEFAULT',
+//   EDITING: 'EDITING',
+// };
 
 export default class Event {
   constructor(eventsListElement, changeData, changeMode) {
@@ -27,6 +28,7 @@ export default class Event {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._handleCloseEditClick = this._handleCloseEditClick.bind(this);
   }
 
   init(event) {
@@ -37,7 +39,7 @@ export default class Event {
     const prevFormComponent = this._eventFormComponent;
 
     this._eventItemComponent = new TripEventItemView(this._event);
-    this._eventFormComponent = new TripEventFormView(this._event, EVENT_FORM_BUTTON_RESET_TEXT.edit);
+    this._eventFormComponent = new TripEventFormView(this._event, EVENT_FORM_MODE.edit);
 
     this._eventItemComponent.setEditClickHandler(this._handleEditClick);
     this._eventFormComponent.setSubmitHandler(this._handleFormSubmit);
@@ -77,6 +79,7 @@ export default class Event {
   _replaceItemToForm() {
     replace(this._eventFormComponent, this._eventItemComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
+    this._eventFormComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', this. _handleCloseEditClick);
     this._changeMode();
     this._mode = MODE.EDITING;
   }
@@ -91,11 +94,17 @@ export default class Event {
       evt.preventDefault();
       this._replaceFormToItem();
       document.removeEventListener('keydown', this._escKeyDownHandler);
+      this._eventFormComponent.getElement().querySelector('.event__rollup-btn').removeEventListener('click', this. _handleCloseEditClick);
     }
   }
 
   _handleEditClick() {
     this._replaceItemToForm();
+  }
+
+  _handleCloseEditClick() {
+    this._replaceFormToItem();
+    document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleFavoriteClick() {
@@ -119,8 +128,8 @@ export default class Event {
   }
 
   _handleFormSubmit(event) {
-    this._changeEventPrice();
-    this._changeEventDate();
+    // this._changeEventPrice();
+    // this._changeEventDate();
     this._changeData(event);
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._replaceFormToItem();

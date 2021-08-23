@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 import AbstractView from './abstract';
 
-const createTripItemTemplate = (data) => {
-  const {type, options, destination, basePrice, isFavorite, dateFrom, dateTo} = data;
+const createTripItemTemplate = (event) => {
+  const {type, options, destination, basePrice, isFavorite, dateFrom, dateTo} = event;
   const destinationName = destination.name;
 
   const createTripItemOffersList = () => {

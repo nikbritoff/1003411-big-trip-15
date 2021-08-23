@@ -1,11 +1,12 @@
 import dayjs from 'dayjs';
 import { EVENT_DESTINATION_NAMES } from '../mock/event';
 import AbstractView from './abstract';
+import { EVENT_FORM_MODE } from '../utils/const.js';
 
 const setOptions = (options) => {
-  let avialableOptins = '';
+  let avialableOptions = '';
   options.forEach((currentOption, index) => {
-    avialableOptins += `
+    avialableOptions += `
     <div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-${index}" type="checkbox" name="event-offer-comfort" ${currentOption.isChecked ? 'checked' : ''}>
       <label class="event__offer-label" for="event-offer-comfort-${index}">
@@ -15,16 +16,16 @@ const setOptions = (options) => {
       </label>
     </div>`;
   });
-  if (avialableOptins) {
+  if (avialableOptions) {
     return `<section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
       <div class="event__available-offers">
-        ${avialableOptins}
+        ${avialableOptions}
       </div>
     </section>`;
   }
-  return avialableOptins;
+  return avialableOptions;
 };
 
 const setDestinationList = (destinationList) => {
@@ -36,8 +37,7 @@ const setDestinationList = (destinationList) => {
 };
 
 const createEventFormTemplate = (data, resetButtonText) => {
-  const {type, destination, options, basePrice, dateFrom, dateTo} = data;
-
+  const {type, destination, options, basePrice, dateFrom, dateTo, isHasOptions, isHasPictures} = data;
   const setPictures = () => {
     let images = '';
 
@@ -45,9 +45,11 @@ const createEventFormTemplate = (data, resetButtonText) => {
       images = `${images} <img class="event__photo" src="${image.src}" alt="${image.description}">`;
     });
 
-    return `<div class="event__photos-tape">
-      ${images}
-    </div>`;
+    return `<div class="event__photos-container">
+              <div class="event__photos-tape">
+                ${images}
+              </div>
+            </div>`;
   };
 
   return `<li class="trip-events__item">
@@ -121,7 +123,7 @@ const createEventFormTemplate = (data, resetButtonText) => {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
         ${setDestinationList(EVENT_DESTINATION_NAMES)}
       </div>
 
@@ -143,18 +145,14 @@ const createEventFormTemplate = (data, resetButtonText) => {
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">${resetButtonText}</button>
+      ${data.isEditMode() ? '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>' : ''}
     </header>
     <section class="event__details">
-      ${setOptions(options, type)}
+      ${isHasOptions() ?  setOptions(options, type) : ''}
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">${destination.name}</h3>
         <p class="event__destination-description">${destination.description}</p>
-
-        <div class="event__photos-container">
-          <div class="event__photos-tape">
-            ${setPictures(options, type)}
-          </div>
-        </div>
+          ${isHasPictures() ? setPictures(options, type) : ''}
       </section>
     </section>
   </form>
@@ -162,11 +160,17 @@ const createEventFormTemplate = (data, resetButtonText) => {
 };
 
 export default class TripEventForm extends AbstractView{
-  constructor(data, resetButtonText) {
+  constructor(event, mode) {
     super();
-    this._data = data;
-    this._resetButtonText = resetButtonText;
+    this._resetButtonText = mode;
+    this._data = TripEventForm.parseEventToData(event, this._resetButtonText);
     this._editSubmitHandler = this._editSubmitHandler.bind(this);
+    this._eventTypeListClickHandler = this._eventTypeListClickHandler.bind(this);
+    this._priceInputHandler = this._priceInputHandler.bind(this);
+
+    this._destinationInputHandler = this._destinationInputHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
@@ -175,11 +179,128 @@ export default class TripEventForm extends AbstractView{
 
   _editSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.editSubmit(this._data);
+    this._callback.editSubmit(TripEventForm.parseDataToEvent(this._data));
   }
 
   setSubmitHandler(callback) {
     this._callback.editSubmit = callback;
     this.getElement().addEventListener('submit', this._editSubmitHandler);
+  }
+
+  // VIEW 6
+
+  static parseEventToData(event, mode) {
+    return Object.assign(
+      {},
+      event,
+      {
+        isHasOptions: function() {
+          return event.options.length !== 0;
+        },
+        isHasPictures: function() {
+          return event.destination.pictures.length !== 0;
+        },
+        isEditMode: function() {
+          return mode === EVENT_FORM_MODE.edit;
+        },
+      },
+    );
+  }
+
+  static parseDataToEvent(data) {
+    data = Object.assign({}, data);
+
+    delete data.isHasOptions;
+    delete data.isHasPictures;
+
+    return data;
+  }
+
+  updateElement() {
+    const prevElement = this.getElement();
+    const parent = prevElement.parentElement;
+    this.removeElement();
+
+    const newElement = this.getElement();
+
+    parent.replaceChild(newElement, prevElement);
+
+    this.restoreHandlers();
+  }
+
+  updateData(update, justDataUpdating) {
+    if (!update) {
+      return;
+    }
+
+    this._data = Object.assign(
+      {},
+      this._data,
+      update,
+    );
+
+    if (justDataUpdating) {
+      return;
+    }
+
+    this.updateElement();
+  }
+
+
+  // 6.1.4 Добавляю слушатель внутренних обработчиков
+  _eventTypeListClickHandler(evt) {
+    evt.preventDefault();
+    const selectedType = evt.target.previousElementSibling.value;
+
+    this.updateData({
+      type: selectedType,
+    });
+  }
+
+  _destinationInputHandler(evt) {
+    const input = evt.target;
+    evt.preventDefault();
+    const selectedDestinationName = evt.target.value;
+    input.blur();
+
+    const description = this._data.destination.description;
+    const pictures = this._data.destination.pictures;
+    this.updateData({
+      destination: {
+        name: selectedDestinationName,
+        description: description,
+        pictures: pictures,
+      },
+    }, false);
+  }
+
+  // Этот метод добавлен, чтобы очищать инпут, так как иначе datalist не отображается.
+  // С этим методом список отображается после 2 кликов по input с городом
+  _destinationClickHandler(evt) {
+    evt.preventDefault();
+    evt.target.value = '';
+  }
+
+  // 6.1.5 Добавляю восстановление слушателей внутренних обработчиков
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setSubmitHandler(this._callback.editSubmit);
+  }
+
+  _setInnerHandlers() {
+    this.getElement().querySelector('.event__type-list').addEventListener('click', this._eventTypeListClickHandler);
+    this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceInputHandler);
+    this.getElement().querySelector('.event__input--destination').addEventListener('input', this._destinationInputHandler);
+    // Это обработчик для очистки по клику
+    this.getElement().querySelector('.event__input--destination').addEventListener('click', this._destinationClickHandler);
+  }
+
+  // 6.1.6 Сохранение данных ввода
+  _priceInputHandler(evt) {
+    evt.preventDefault();
+
+    this.updateData({
+      basePrice: Number(evt.target.value),
+    }, true);
   }
 }
