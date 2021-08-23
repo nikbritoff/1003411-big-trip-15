@@ -3,16 +3,6 @@ import TripEventFormView from '../view/trip-event-form.js';
 import { EVENT_FORM_MODE, MODE } from '../utils/const.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
 
-// const EVENT_FORM_BUTTON_RESET_TEXT = {
-//   edit: 'Delete',
-//   cancel: 'Cancel',
-// };
-
-// const MODE = {
-//   DEFAULT: 'DEFAULT',
-//   EDITING: 'EDITING',
-// };
-
 export default class Event {
   constructor(eventsListElement, changeData, changeMode) {
     this._eventsListComponent = eventsListElement;
@@ -92,9 +82,10 @@ export default class Event {
   _escKeyDownHandler(evt) {
     if (evt.key === 'Esc' || evt.key === 'Escape') {
       evt.preventDefault();
-      this._replaceFormToItem();
-      document.removeEventListener('keydown', this._escKeyDownHandler);
       this._eventFormComponent.getElement().querySelector('.event__rollup-btn').removeEventListener('click', this. _handleCloseEditClick);
+      this._eventFormComponent.reset(this._event);
+      document.removeEventListener('keydown', this._escKeyDownHandler);
+      this._replaceFormToItem();
     }
   }
 
@@ -128,8 +119,6 @@ export default class Event {
   }
 
   _handleFormSubmit(event) {
-    // this._changeEventPrice();
-    // this._changeEventDate();
     this._changeData(event);
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._replaceFormToItem();

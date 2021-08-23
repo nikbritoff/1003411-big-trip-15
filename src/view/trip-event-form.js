@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import { EVENT_DESTINATION_NAMES } from '../mock/event';
-import AbstractView from './abstract';
+import Smart from './smart';
+import { EVENT_DESTINATION_NAMES, OPTION_TITLES } from '../mock/event';
 import { EVENT_FORM_MODE } from '../utils/const.js';
 
 const setOptions = (options) => {
@@ -159,7 +159,7 @@ const createEventFormTemplate = (data, resetButtonText) => {
 </li>`;
 };
 
-export default class TripEventForm extends AbstractView{
+export default class TripEventForm extends Smart{
   constructor(event, mode) {
     super();
     this._resetButtonText = mode;
@@ -216,45 +216,14 @@ export default class TripEventForm extends AbstractView{
     return data;
   }
 
-  updateElement() {
-    const prevElement = this.getElement();
-    const parent = prevElement.parentElement;
-    this.removeElement();
-
-    const newElement = this.getElement();
-
-    parent.replaceChild(newElement, prevElement);
-
-    this.restoreHandlers();
-  }
-
-  updateData(update, justDataUpdating) {
-    if (!update) {
-      return;
-    }
-
-    this._data = Object.assign(
-      {},
-      this._data,
-      update,
-    );
-
-    if (justDataUpdating) {
-      return;
-    }
-
-    this.updateElement();
-  }
-
-
-  // 6.1.4 Добавляю слушатель внутренних обработчиков
   _eventTypeListClickHandler(evt) {
     evt.preventDefault();
     const selectedType = evt.target.previousElementSibling.value;
-
+    const newOptions = OPTION_TITLES[selectedType] !== undefined ? OPTION_TITLES[selectedType].options : [];
     this.updateData({
       type: selectedType,
-    });
+      options: newOptions,
+    }, false);
   }
 
   _destinationInputHandler(evt) {
@@ -281,7 +250,6 @@ export default class TripEventForm extends AbstractView{
     evt.target.value = '';
   }
 
-  // 6.1.5 Добавляю восстановление слушателей внутренних обработчиков
   restoreHandlers() {
     this._setInnerHandlers();
     this.setSubmitHandler(this._callback.editSubmit);
@@ -295,12 +263,17 @@ export default class TripEventForm extends AbstractView{
     this.getElement().querySelector('.event__input--destination').addEventListener('click', this._destinationClickHandler);
   }
 
-  // 6.1.6 Сохранение данных ввода
   _priceInputHandler(evt) {
     evt.preventDefault();
 
     this.updateData({
       basePrice: Number(evt.target.value),
     }, true);
+  }
+
+  reset(event) {
+    this.updateData(
+      TripEventForm.parseDataToEvent(event),
+    );
   }
 }
