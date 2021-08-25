@@ -4,4 +4,14 @@ const SORT_TYPE = {
   TIME: 'time',
 };
 
-export {SORT_TYPE};
+const EVENT_FORM_MODE = {
+  edit: 'Delete',
+  add: 'Cancel',
+};
+
+const MODE = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
+export {SORT_TYPE, MODE, EVENT_FORM_MODE};
