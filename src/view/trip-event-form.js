@@ -165,10 +165,12 @@ export default class TripEventForm extends Smart{
     this._resetButtonText = mode;
     this._data = TripEventForm.parseEventToData(event, this._resetButtonText);
     this._editSubmitHandler = this._editSubmitHandler.bind(this);
+    this._editCloseClickHandler = this._editCloseClickHandler.bind(this);
     this._eventTypeListClickHandler = this._eventTypeListClickHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
 
     this._destinationInputHandler = this._destinationInputHandler.bind(this);
+
 
     this._setInnerHandlers();
   }
@@ -185,6 +187,17 @@ export default class TripEventForm extends Smart{
   setSubmitHandler(callback) {
     this._callback.editSubmit = callback;
     this.getElement().addEventListener('submit', this._editSubmitHandler);
+  }
+
+  //
+  _editCloseClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeEditClickHandler();
+  }
+
+  setEditCloseCLickHandler(callback) {
+    this._callback.closeEditClickHandler = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editCloseClickHandler);
   }
 
   // VIEW 6
@@ -253,6 +266,7 @@ export default class TripEventForm extends Smart{
   restoreHandlers() {
     this._setInnerHandlers();
     this.setSubmitHandler(this._callback.editSubmit);
+    this.setEditCloseCLickHandler(this._callback.closeEditClickHandler);
   }
 
   _setInnerHandlers() {
