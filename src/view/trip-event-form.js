@@ -333,7 +333,7 @@ export default class TripEventForm extends Smart{
       this.getElement().querySelector('#event-end-time-1'),
       {
         dateFormat: 'd/m/y H:i',
-        defaultDate: this._data.dateFrom,enableTime: true,
+        defaultDate: this._data.dateTo,enableTime: true,
         time_24hr: true,
         onChange: this._dateFromChangekHandler, // На событие flatpickr передаём наш колбэк
       },
