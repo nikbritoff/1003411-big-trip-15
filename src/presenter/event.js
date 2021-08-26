@@ -18,7 +18,7 @@ export default class Event {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    // this._handleCloseEditClick = this._handleCloseEditClick.bind(this);
+    this._handleCloseEditClick = this._handleCloseEditClick.bind(this);
   }
 
   init(event) {
@@ -36,7 +36,7 @@ export default class Event {
     this._eventItemComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
     this._handleCloseEditClick = this._handleCloseEditClick.bind(this);
-    this._eventFormComponent.setEditCloseCLickHandler(this._handleCloseEditClick);
+    // this._eventFormComponent.setEditCloseCLickHandler(this._handleCloseEditClick);
 
 
     // Проверка создавались ли компоненты ранее.

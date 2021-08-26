@@ -1,5 +1,7 @@
 const path = require('path');
-const dayjs = require('dayjs')
+const dayjs = require('dayjs');
+const duration = require('dayjs/plugin/duration')
+dayjs.extend(duration);
 
 module.exports = {
   entry: './src/main.js',
@@ -11,5 +13,13 @@ module.exports = {
   devServer: {
     contentBase: path.resolve(__dirname, 'public'),
     watchContentBase: true,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader']
+      }
+    ]
   }
 };
