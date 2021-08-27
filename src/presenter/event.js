@@ -35,6 +35,9 @@ export default class Event {
     this._eventFormComponent.setSubmitHandler(this._handleFormSubmit);
     this._eventItemComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
+    this._handleCloseEditClick = this._handleCloseEditClick.bind(this);
+    // this._eventFormComponent.setEditCloseCLickHandler(this._handleCloseEditClick);
+
 
     // Проверка создавались ли компоненты ранее.
     if (prevItemComponent === null || prevFormComponent === null) {
@@ -69,7 +72,7 @@ export default class Event {
   _replaceItemToForm() {
     replace(this._eventFormComponent, this._eventItemComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
-    this._eventFormComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', this. _handleCloseEditClick);
+    // this._eventFormComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', this. _handleCloseEditClick);
     this._changeMode();
     this._mode = MODE.EDITING;
   }
@@ -82,7 +85,6 @@ export default class Event {
   _escKeyDownHandler(evt) {
     if (evt.key === 'Esc' || evt.key === 'Escape') {
       evt.preventDefault();
-      this._eventFormComponent.getElement().querySelector('.event__rollup-btn').removeEventListener('click', this. _handleCloseEditClick);
       this._eventFormComponent.reset(this._event);
       document.removeEventListener('keydown', this._escKeyDownHandler);
       this._replaceFormToItem();

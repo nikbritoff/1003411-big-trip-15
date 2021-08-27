@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import  duration  from 'dayjs/plugin/duration';
+dayjs.extend(duration);
 import AbstractView from './abstract';
 
 const createTripItemTemplate = (event) => {
@@ -31,8 +33,41 @@ const createTripItemTemplate = (event) => {
   const setEventFavoriteStatus = () => isFavorite ? 'event__favorite-btn--active' : '';
 
   const getEventDuration = (start, end) => {
-    const duration = dayjs(end).diff(start, 'minute');
-    return duration;
+    start = dayjs(start);
+    end = dayjs(end);
+    const eventDuration = dayjs.duration(end.diff(start));
+
+    let result = '';
+    if (eventDuration.days() > 0) {
+      const days = `${eventDuration.format('DD')}D `;
+      result += days;
+    }
+
+    if (eventDuration.hours() > 0) {
+      const hours = `${eventDuration.hours()}H `;
+      result += hours;
+    }
+
+    if (eventDuration.minutes() > 0) {
+      const minutes = `${eventDuration.minutes()}M`;
+      result += minutes;
+    }
+    return result;
+  };
+
+  const getShortRenderTime = (date) => {
+    let hour = dayjs(date).hour();
+    let minute = dayjs(date).minute();
+    if (hour < 10) {
+      hour = `0${hour}`;
+    }
+
+    if (minute < 10) {
+      minute = `0${minute}`;
+    }
+
+
+    return `${hour}:${minute}`;
   };
 
   return `<li class="trip-events__item">
@@ -44,11 +79,12 @@ const createTripItemTemplate = (event) => {
     <h3 class="event__title">${type} ${destinationName}</h3>
     <div class="event__schedule">
       <p class="event__time">
-      <time class="event__start-time" datetime="${dayjs(dateFrom).format('YYYY-MM-DDTHH:MM')}">${dayjs(dateFrom).format('HH:MM')}</time>
+
+      <time class="event__start-time" datetime="${dayjs(dateFrom).format('YYYY-MM-DDTHH:MM')}">${getShortRenderTime(dateFrom)}</time>
         &mdash;
-        <time class="event__end-time" datetime="${dayjs(dateTo).format('YYYY-MM-DDTHH:MM')}">${dayjs(dateTo).format('HH:MM')}</time>
+        <time class="event__end-time" datetime="${dayjs(dateTo).format('YYYY-MM-DDTHH:MM')}">${getShortRenderTime(dateTo)}</time>
       </p>
-      <p class="event__duration">${getEventDuration(dateFrom, dateTo)}M</p>
+      <p class="event__duration">${getEventDuration(dateFrom, dateTo)}</p>
     </div>
     <p class="event__price">
       &euro;&nbsp;<span class="event__price-value">${getFullEventPrice()}</span>

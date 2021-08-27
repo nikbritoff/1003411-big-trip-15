@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import Smart from './smart';
 import { EVENT_DESTINATION_NAMES, OPTION_TITLES } from '../mock/event';
 import { EVENT_FORM_MODE } from '../utils/const.js';
@@ -163,14 +165,21 @@ export default class TripEventForm extends Smart{
   constructor(event, mode) {
     super();
     this._resetButtonText = mode;
+    this._datepickerDateFrom = null;
+    this._datepickerDateTo = null;
     this._data = TripEventForm.parseEventToData(event, this._resetButtonText);
     this._editSubmitHandler = this._editSubmitHandler.bind(this);
+    this._editCloseClickHandler = this._editCloseClickHandler.bind(this);
     this._eventTypeListClickHandler = this._eventTypeListClickHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
 
     this._destinationInputHandler = this._destinationInputHandler.bind(this);
+    this._dateFromChangekHandler = this._dateFromChangekHandler.bind(this);
+
 
     this._setInnerHandlers();
+    this._setDatepickerDateFrom();
+    this._setDatepickerDateTo();
   }
 
   getTemplate() {
@@ -185,6 +194,16 @@ export default class TripEventForm extends Smart{
   setSubmitHandler(callback) {
     this._callback.editSubmit = callback;
     this.getElement().addEventListener('submit', this._editSubmitHandler);
+  }
+
+  _editCloseClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeEditClickHandler();
+  }
+
+  setEditCloseCLickHandler(callback) {
+    this._callback.closeEditClickHandler = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editCloseClickHandler);
   }
 
   // VIEW 6
@@ -253,6 +272,9 @@ export default class TripEventForm extends Smart{
   restoreHandlers() {
     this._setInnerHandlers();
     this.setSubmitHandler(this._callback.editSubmit);
+    this.setEditCloseCLickHandler(this._callback.closeEditClickHandler);
+    this._setDatepickerDateFrom();
+    this._setDatepickerDateTo();
   }
 
   _setInnerHandlers() {
@@ -274,6 +296,47 @@ export default class TripEventForm extends Smart{
   reset(event) {
     this.updateData(
       TripEventForm.parseDataToEvent(event),
+    );
+  }
+
+  // Datepicker
+  _dateFromChangekHandler([userData]) {
+    this.updateData({
+      dateFrom: dayjs([userData]).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+    }, true);
+  }
+
+  _setDatepickerDateFrom() {
+    if (this._datepickerDateFrom) {
+      this._datepickerDateFrom.destroy();
+      this._datepickerDateFrom = null;
+    }
+
+    this._datepickerDateFrom = flatpickr(
+      this.getElement().querySelector('#event-start-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._data.dateFrom,enableTime: true,
+        time_24hr: true,
+        onChange: this._dateFromChangekHandler, // На событие flatpickr передаём наш колбэк
+      },
+    );
+  }
+
+  _setDatepickerDateTo() {
+    if (this._datepickerDateTo) {
+      this._datepickerDateTo.destroy();
+      this._datepickerDateTo = null;
+    }
+
+    this._datepickerDateTo = flatpickr(
+      this.getElement().querySelector('#event-end-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._data.dateTo,enableTime: true,
+        time_24hr: true,
+        onChange: this._dateFromChangekHandler, // На событие flatpickr передаём наш колбэк
+      },
     );
   }
 }
