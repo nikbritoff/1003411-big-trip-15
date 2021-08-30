@@ -137,8 +137,4 @@ export default class TripEventItem extends AbstractView{
     this._callback.favoriteClick = callback;
     this.getElement().querySelector('.event__favorite-btn ').addEventListener('click', this._favoriteClickHandler);
   }
-
-
-  // Model
-
 }

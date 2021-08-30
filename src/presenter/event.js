@@ -76,7 +76,6 @@ export default class Event {
   _replaceItemToForm() {
     replace(this._eventFormComponent, this._eventItemComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
-    // this._eventFormComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', this. _handleCloseEditClick);
     this._changeMode();
     this._mode = MODE.EDITING;
   }
@@ -118,7 +117,6 @@ export default class Event {
   }
 
   _changeEventPrice() {
-    // this._event.basePrice = Number(this._eventFormComponent.getElement().querySelector('.event__input--price').value);
     this._event.basePrice = Number(this._eventFormComponent.getElement().querySelector('.event__input--price').value);
   }
 
@@ -127,13 +125,8 @@ export default class Event {
     this._event.dateTo = this._eventFormComponent.getElement().querySelector('#event-end-time-1').value;
   }
 
-  // _handleFormSubmit(event) {
-  //   this._changeData(event);
-  //   document.removeEventListener('keydown', this._escKeyDownHandler);
-  //   this._replaceFormToItem();
-  // }
   _handleFormSubmit(update) {
-    // Здесь вызывает метод _handleViewAction
+    // Здесь вызывается метод _handleViewAction
     const isMajorUpdate =
       this._event.dateFrom !== update.dateFrom ||
       this._event.dateTo !== update.dateTo ||
@@ -142,12 +135,8 @@ export default class Event {
 
     const isMinorUpdate = this._event.type !== update.type;
 
-    console.log(isMinorUpdate);
-
-    // this._changeData(event);
     this._changeData(
       USER_ACTION.UPDATE_EVENT,
-      // isMinorUpdate ? UPDATE_TYPE.MINOR : UPDATE_TYPE.PATCH,
       getUpdateType(isMinorUpdate, isMajorUpdate),
       update,
     );

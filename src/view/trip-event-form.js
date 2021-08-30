@@ -200,7 +200,6 @@ export default class TripEventForm extends Smart{
 
   _editCloseClickHandler(evt) {
     evt.preventDefault();
-    console.log(this);
     this._callback.closeEditClickHandler();
   }
 

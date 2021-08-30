@@ -1,8 +1,7 @@
 import AbstractView from './abstract';
 import { SORT_TYPE } from '../utils/const';
 
-// const createSiteSortingTemplate = () => (
-const createSiteSortingTemplate = (_currentSortType) => (
+const createSiteSortingTemplate = () => (
   `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
   <div class="trip-sort__item  trip-sort__item--day">
     <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" data-sort-type="${SORT_TYPE.DEFAULT}">
@@ -32,7 +31,6 @@ const createSiteSortingTemplate = (_currentSortType) => (
 );
 
 export default class SiteSorting extends AbstractView{
-  // constructor() {
   constructor(currentSortType) {
     super();
     this._currentSortType = currentSortType;
@@ -53,7 +51,6 @@ export default class SiteSorting extends AbstractView{
   }
 
   getTemplate() {
-    // return createSiteSortingTemplate();
     return createSiteSortingTemplate(this._currentSortType);
   }
 }
