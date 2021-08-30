@@ -2,6 +2,8 @@ const path = require('path');
 const dayjs = require('dayjs');
 const duration = require('dayjs/plugin/duration')
 dayjs.extend(duration);
+const isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
+dayjs.extend(isSameOrAfter);
 
 module.exports = {
   entry: './src/main.js',

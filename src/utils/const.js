@@ -29,4 +29,10 @@ const UPDATE_TYPE = {
   // Обновление всей страницы: цена, пункт назначения, дата начала/конца, удаление, добавление
 };
 
-export {SORT_TYPE, MODE, EVENT_FORM_MODE, USER_ACTION, UPDATE_TYPE};
+const FILTER_TYPE = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
+};
+
+export {SORT_TYPE, MODE, EVENT_FORM_MODE, USER_ACTION, UPDATE_TYPE, FILTER_TYPE};
