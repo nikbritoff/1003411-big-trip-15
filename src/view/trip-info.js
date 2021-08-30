@@ -19,8 +19,12 @@ const setRouteName = (data) => {
 };
 
 const setRouteDates = (data) => {
-  const dates = `${dayjs(data[0].dateFrom).format('DD MMM')}&nbsp;&mdash;&nbsp;${dayjs(data[data.length - 1].dateTo).format('DD MMM')}`;
-  return dates;
+  if (data.dateFrom !== undefined && data.dateTo !== undefined) {
+    const dates = `${dayjs(data[0].dateFrom).format('DD MMM')}&nbsp;&mdash;&nbsp;${dayjs(data[data.length - 1].dateTo).format('DD MMM')}`;
+    return dates;
+  }
+
+  return '';
 };
 
 const setRouteTotalPrice = (data) => data.reduce((sum, point) => sum + point.basePrice, 0);

@@ -175,7 +175,9 @@ export default class TripEventForm extends Smart{
 
     this._destinationInputHandler = this._destinationInputHandler.bind(this);
     this._dateFromChangekHandler = this._dateFromChangekHandler.bind(this);
+    this._dateToChangekHandler = this._dateToChangekHandler.bind(this);
 
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepickerDateFrom();
@@ -198,6 +200,7 @@ export default class TripEventForm extends Smart{
 
   _editCloseClickHandler(evt) {
     evt.preventDefault();
+    console.log(this);
     this._callback.closeEditClickHandler();
   }
 
@@ -296,6 +299,7 @@ export default class TripEventForm extends Smart{
   reset(event) {
     this.updateData(
       TripEventForm.parseDataToEvent(event),
+      this.setDeleteClickHandler(this._callback.deleteClick),
     );
   }
 
@@ -303,6 +307,12 @@ export default class TripEventForm extends Smart{
   _dateFromChangekHandler([userData]) {
     this.updateData({
       dateFrom: dayjs([userData]).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+    }, true);
+  }
+
+  _dateToChangekHandler([userData]) {
+    this.updateData({
+      dateTo: dayjs([userData]).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
     }, true);
   }
 
@@ -317,7 +327,7 @@ export default class TripEventForm extends Smart{
       {
         dateFormat: 'd/m/y H:i',
         defaultDate: this._data.dateFrom,enableTime: true,
-        time_24hr: true,
+        'time_24hr': true,
         onChange: this._dateFromChangekHandler, // На событие flatpickr передаём наш колбэк
       },
     );
@@ -334,9 +344,32 @@ export default class TripEventForm extends Smart{
       {
         dateFormat: 'd/m/y H:i',
         defaultDate: this._data.dateTo,enableTime: true,
-        time_24hr: true,
-        onChange: this._dateFromChangekHandler, // На событие flatpickr передаём наш колбэк
+        'time_24hr': true,
+        onChange: this._dateToChangekHandler, // На событие flatpickr передаём наш колбэк
       },
     );
+  }
+
+
+  // Model
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepickerDateFrom || this._datepickerDateTo) {
+      this._datepickerDateTo.destroy();
+      this._datepickerDateTo = null;
+      this._datepickerDateFrom.destroy();
+      this._datepickerDateFrom = null;
+    }
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(TripEventForm.parseDataToEvent(this._data));
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
   }
 }
