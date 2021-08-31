@@ -5,7 +5,7 @@ import TripInfoView from '../view/trip-info';
 import SiteSortingView from '../view/site-sorting';
 import NoEventView from '../view/no-events';
 import EventPresenter from './event.js';
-import { SORT_TYPE, UPDATE_TYPE, USER_ACTION } from '../utils/const.js';
+import { SORT_TYPE, UPDATE_TYPE, USER_ACTION, FILTER_TYPE } from '../utils/const.js';
 import { sortDurationUp, sortPriceUp } from '../utils/event.js';
 import { filter } from '../utils/filter.js';
 
@@ -20,10 +20,11 @@ export default class Trip {
     this._siteMenuComponent = new SiteMenuView();
     this._tripSortingComponent = null;
     this._eventsListComponent = new SiteEventsListView();
-    this._noEventsComponent = new NoEventView();
 
     this._eventPresenter = new Map();
+    this._filterType = FILTER_TYPE.EVERYTHING;
     this._currentSortType = SORT_TYPE.DEFAULT;
+    this._noEventsComponent = null;
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
@@ -79,6 +80,7 @@ export default class Trip {
 
   _renderNoEvents() {
     // Отрисовка заглушки на странице
+    this._noEventsComponent = new NoEventView(this._filterType);
     render(this._eventsListComponent, this._noEventsComponent, RenderPosition.BEFOREEND);
   }
 
@@ -145,9 +147,9 @@ export default class Trip {
 
   // Model
   _getEvents() {
-    const filterType = this._filterModel.getFilter();
+    this._filterType = this._filterModel.getFilter();
     const events = this._eventsModel.getEvents();
-    const filteredEvents = filter[filterType](events);
+    const filteredEvents = filter[this._filterType](events);
 
     switch (this._currentSortType) {
       case SORT_TYPE.TIME:
@@ -164,7 +166,10 @@ export default class Trip {
     this._eventPresenter.forEach((presenter) => presenter.destroy());
     this._eventPresenter.clear();
 
-    remove(this._noEventsComponent);
+
+    if(this._noEventsComponent) {
+      remove(this._noEventsComponent);
+    }
 
     if (resetSortType) {
       remove(this._tripSortingComponent);
