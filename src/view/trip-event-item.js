@@ -57,18 +57,10 @@ const createTripItemTemplate = (event) => {
   };
 
   const getShortRenderTime = (date) => {
-    let hour = dayjs(date).hour();
-    let minute = dayjs(date).minute();
-    if (hour < 10) {
-      hour = `0${hour}`;
-    }
+    const hour = String(dayjs(date).hour());
+    const minute = String(dayjs(date).minute());
 
-    if (minute < 10) {
-      minute = `0${minute}`;
-    }
-
-
-    return `${hour}:${minute}`;
+    return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
   };
 
   return `<li class="trip-events__item">
