@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import he from 'he';
 import  duration  from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 import AbstractView from './abstract';
@@ -76,7 +77,7 @@ const createTripItemTemplate = (event) => {
     <div class="event__type">
       <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
     </div>
-    <h3 class="event__title">${type} ${destinationName}</h3>
+    <h3 class="event__title">${type} ${he.encode(destinationName)}</h3>
     <div class="event__schedule">
       <p class="event__time">
 
@@ -87,7 +88,7 @@ const createTripItemTemplate = (event) => {
       <p class="event__duration">${getEventDuration(dateFrom, dateTo)}</p>
     </div>
     <p class="event__price">
-      &euro;&nbsp;<span class="event__price-value">${getFullEventPrice()}</span>
+      &euro;&nbsp;<span class="event__price-value">${he.encode(String(getFullEventPrice()))}</span>
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     ${createTripItemOffersList()}

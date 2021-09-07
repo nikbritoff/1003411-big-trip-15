@@ -4,6 +4,7 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import Smart from './smart';
 import { EVENT_DESTINATION_NAMES, OPTION_TITLES } from '../mock/event';
 import { EVENT_FORM_MODE } from '../utils/const.js';
+import he from 'he';
 import { EVENT_TYPES } from '../mock/event';
 
 const setOptions = (options) => {
@@ -93,16 +94,16 @@ const createEventFormTemplate = (data, resetButtonText) => {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
         ${setDestinationList(EVENT_DESTINATION_NAMES)}
       </div>
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(dateFrom).format('DD/MM/YY HH:mm')}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${he.encode(dayjs(dateFrom).format('DD/MM/YY HH:mm'))}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(dateTo).format('DD/MM/YY HH:mm')}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${he.encode(dayjs(dateTo).format('DD/MM/YY HH:mm'))}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -110,7 +111,7 @@ const createEventFormTemplate = (data, resetButtonText) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(String(basePrice))}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -120,8 +121,8 @@ const createEventFormTemplate = (data, resetButtonText) => {
     <section class="event__details">
       ${isHasOptions() ?  setOptions(options, type) : ''}
       <section class="event__section  event__section--destination">
-        <h3 class="event__section-title  event__section-title--destination">${destination.name}</h3>
-        <p class="event__destination-description">${destination.description}</p>
+        <h3 class="event__section-title  event__section-title--destination">${he.encode(destination.name)}</h3>
+        <p class="event__destination-description">${he.encode(destination.description)}</p>
           ${isHasPictures() ? setPictures(options, type) : ''}
       </section>
     </section>

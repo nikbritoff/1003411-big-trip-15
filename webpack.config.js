@@ -4,6 +4,7 @@ const duration = require('dayjs/plugin/duration')
 dayjs.extend(duration);
 const isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
 dayjs.extend(isSameOrAfter);
+const he = require('he');
 
 module.exports = {
   entry: './src/main.js',
