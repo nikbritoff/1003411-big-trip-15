@@ -8,6 +8,8 @@ import EventPresenter from './event.js';
 import { SORT_TYPE, UPDATE_TYPE, USER_ACTION, FILTER_TYPE } from '../utils/const.js';
 import { sortDurationUp, sortPriceUp } from '../utils/event.js';
 import { filter } from '../utils/filter.js';
+import EventNewPresenter from './event-new.js';
+
 
 export default class Trip {
   constructor(siteTripMainElement, tripEventsElement, eventsModel, filterModel) {
@@ -21,6 +23,8 @@ export default class Trip {
     this._tripSortingComponent = null;
     this._eventsListComponent = new SiteEventsListView();
 
+    //
+
     this._eventPresenter = new Map();
     this._filterType = FILTER_TYPE.EVERYTHING;
     this._currentSortType = SORT_TYPE.DEFAULT;
@@ -31,8 +35,11 @@ export default class Trip {
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
+    this._EventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._handleViewAction);
     this._eventsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+
+    this.crateEvent = this.crateEvent.bind(this);
   }
 
   init() {
@@ -85,6 +92,7 @@ export default class Trip {
   }
 
   _handleModeChange() {
+    this._EventNewPresenter.destroy();
     this._eventPresenter.forEach((presenter) => presenter.resetView());
   }
 
@@ -93,6 +101,7 @@ export default class Trip {
     // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
     // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
     // update - обновленные данные
+    // console.log('biew action', this._eventsModel);
     switch (actionType) {
       case USER_ACTION.UPDATE_EVENT:
         this._eventsModel.updateEvent(updateType, update);
@@ -163,6 +172,7 @@ export default class Trip {
   }
 
   _clearAllEvents({resetSortType = false, resetTripInfo = false} = {}) {
+    this._EventNewPresenter.destroy();
     this._eventPresenter.forEach((presenter) => presenter.destroy());
     this._eventPresenter.clear();
 
@@ -179,5 +189,12 @@ export default class Trip {
     if (resetTripInfo) {
       remove(this._tripInfoComponent);
     }
+  }
+
+  crateEvent() {
+    this._currentSortType = SORT_TYPE.DEFAULT;
+    this._filterModel.setFilter(UPDATE_TYPE.MAJOR, FILTER_TYPE.EVERYTHING);
+    this._EventNewPresenter.init();
+    // console.log('create ', this._EventNewPresenter);
   }
 }

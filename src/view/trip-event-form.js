@@ -4,6 +4,7 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import Smart from './smart';
 import { EVENT_DESTINATION_NAMES, OPTION_TITLES } from '../mock/event';
 import { EVENT_FORM_MODE } from '../utils/const.js';
+import { EVENT_TYPES } from '../mock/event';
 
 const setOptions = (options) => {
   let avialableOptions = '';
@@ -38,6 +39,28 @@ const setDestinationList = (destinationList) => {
   return `<datalist id="destination-list-1">${datalistOptions}</datalist>`;
 };
 
+const createEventTypeItemTemplate = (type, currentType) => `
+  <div class="event__type-item">
+    <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? 'checked' : ''}>
+    <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type.split('').map((symbol, index) => index === 0 ? symbol.toUpperCase() : symbol.toLowerCase()).join('')}</label>
+  </div>
+`;
+
+const createFormEventTypeTemplate = (types, currentType) => {
+  const formEventTypesTemplate = types
+    .map((type) => createEventTypeItemTemplate(type, currentType))
+    .join('');
+
+  return (`
+    <div class="event__type-list">
+      <fieldset class="event__type-group">
+        <legend class="visually-hidden">Event type</legend>
+        ${formEventTypesTemplate}
+      </fieldset>
+    </div>
+  `);
+};
+
 const createEventFormTemplate = (data, resetButtonText) => {
   const {type, destination, options, basePrice, dateFrom, dateTo, isHasOptions, isHasPictures} = data;
   const setPictures = () => {
@@ -63,62 +86,7 @@ const createEventFormTemplate = (data, resetButtonText) => {
           <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
-
-        <div class="event__type-list">
-          <fieldset class="event__type-group">
-            <legend class="visually-hidden">Event type</legend>
-
-            <div class="event__type-item">
-              <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-              <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-              <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-              <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-              <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
-              <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-              <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-              <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-              <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-              <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-              <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-            </div>
-          </fieldset>
-        </div>
+        ${createFormEventTypeTemplate(EVENT_TYPES, type)}
       </div>
 
       <div class="event__field-group  event__field-group--destination">
@@ -274,7 +242,9 @@ export default class TripEventForm extends Smart{
   restoreHandlers() {
     this._setInnerHandlers();
     this.setSubmitHandler(this._callback.editSubmit);
-    this.setEditCloseCLickHandler(this._callback.closeEditClickHandler);
+    if (this._resetButtonText !== EVENT_FORM_MODE.add) {
+      this.setEditCloseCLickHandler(this._callback.closeEditClickHandler);
+    }
     this._setDatepickerDateFrom();
     this._setDatepickerDateTo();
   }
