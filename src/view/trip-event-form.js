@@ -277,23 +277,6 @@ export default class TripEventForm extends Smart{
 
   // Datepicker
   _dateFromChangeHandler([userData]) {
-    console.log('change');
-    console.log([userData]);
-    const elementForValidate = this.getElement().querySelector('#event-start-time-1');
-    elementForValidate.setCustomValidity('');
-    console.log(elementForValidate);
-    let result = '';
-    console.log(this._data);
-
-    if (dayjs([userData]).isSameOrAfter(dayjs(this._data.dateTo), 'minute')) {
-      console.log('Дата начала меньше даты окончания');
-      result = 'Дата окончания не может быть меньше даты начала';
-    }
-
-    elementForValidate.setCustomValidity(result);
-    console.log(result);
-    elementForValidate.reportValidity();
-
     this.updateData({
       dateFrom: dayjs([userData]).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
     }, true);
@@ -317,6 +300,7 @@ export default class TripEventForm extends Smart{
         dateFormat: 'd/m/y H:i',
         defaultDate: this._data.dateFrom,enableTime: true,
         'time_24hr': true,
+        maxDate: this._data.dateTo,
         onChange: this._dateFromChangeHandler, // На событие flatpickr передаём наш колбэк
       },
     );

@@ -38,22 +38,11 @@ const createTripItemTemplate = (event) => {
     end = dayjs(end);
     const eventDuration = dayjs.duration(end.diff(start));
 
-    let result = '';
-    if (eventDuration.days() > 0) {
-      const days = `${eventDuration.format('DD')}D `;
-      result += days;
-    }
+    const days = eventDuration.days() > 0 ? `${eventDuration.format('DD')}D ` : '';
+    const hours = `${String(eventDuration.hours()).padStart(2, '0')}H `;
+    const minutes = `${String(eventDuration.minutes()).padStart(2, '0')}M`;
 
-    if (eventDuration.hours() > 0) {
-      const hours = `${eventDuration.hours()}H `;
-      result += hours;
-    }
-
-    if (eventDuration.minutes() > 0) {
-      const minutes = `${eventDuration.minutes()}M`;
-      result += minutes;
-    }
-    return result;
+    return `${days}${hours}${minutes}`;
   };
 
   const getShortRenderTime = (date) => {
