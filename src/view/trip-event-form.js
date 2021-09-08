@@ -161,21 +161,7 @@ export default class TripEventForm extends Smart{
 
   _editSubmitHandler(evt) {
     evt.preventDefault();
-
-    const elementForValidate = this.getElement().querySelector('form');
-    console.log(elementForValidate);
-    elementForValidate.setCustomValidity('');
-    let result = '';
-    console.log(this._data);
-    if (dayjs(this._data.dateFrom).isSameOrAfter(dayjs(this._data.dateTo), 'minute')) {
-      console.log('Раньше');
-      result = 'Дата окончания не может быть меньше даты начала';
-    }
-
-    elementForValidate.setCustomValidity(result);
-    elementForValidate.reportValidity();
-
-    // this._callback.editSubmit(TripEventForm.parseDataToEvent(this._data));
+    this._callback.editSubmit(TripEventForm.parseDataToEvent(this._data));
   }
 
   setSubmitHandler(callback) {
@@ -291,26 +277,29 @@ export default class TripEventForm extends Smart{
 
   // Datepicker
   _dateFromChangeHandler([userData]) {
+    console.log('change');
+    console.log([userData]);
+    const elementForValidate = this.getElement().querySelector('#event-start-time-1');
+    elementForValidate.setCustomValidity('');
+    console.log(elementForValidate);
+    let result = '';
+    console.log(this._data);
+
+    if (dayjs([userData]).isSameOrAfter(dayjs(this._data.dateTo), 'minute')) {
+      console.log('Дата начала меньше даты окончания');
+      result = 'Дата окончания не может быть меньше даты начала';
+    }
+
+    elementForValidate.setCustomValidity(result);
+    console.log(result);
+    elementForValidate.reportValidity();
+
     this.updateData({
       dateFrom: dayjs([userData]).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
     }, true);
   }
 
   _dateToChangekHandler([userData]) {
-    // this.getElement().querySelector('#event-start-time-1').setCustomValidity('');
-    // this._datepickerDateFrom.setCustomValidity('');
-    // let result = '';
-    // console.log([userData]);
-    // if (dayjs(this._data.dateFrom).isSameOrAfter(dayjs([userData]), 'minute')) {
-    //   console.log('Раньше')
-    //   result = 'Дата окончания не может быть меньше даты начала';
-    // }
-
-    // this._datepickerDateFrom.setCustomValidity(result);
-    // this._datepickerDateFrom.reportValidity();
-    // this.getElement().querySelector('#event-start-time-1').setCustomValidity(result);
-    // this.getElement().querySelector('#event-start-time-1').reportValidity();
-
     this.updateData({
       dateTo: dayjs([userData]).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
     }, true);
@@ -345,6 +334,7 @@ export default class TripEventForm extends Smart{
         dateFormat: 'd/m/y H:i',
         defaultDate: this._data.dateTo,enableTime: true,
         'time_24hr': true,
+        minDate: this._data.dateFrom,
         onChange: this._dateToChangekHandler, // На событие flatpickr передаём наш колбэк
       },
     );
