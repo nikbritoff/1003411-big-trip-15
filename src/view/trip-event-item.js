@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import he from 'he';
 import  duration  from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 import AbstractView from './abstract';
@@ -37,37 +38,18 @@ const createTripItemTemplate = (event) => {
     end = dayjs(end);
     const eventDuration = dayjs.duration(end.diff(start));
 
-    let result = '';
-    if (eventDuration.days() > 0) {
-      const days = `${eventDuration.format('DD')}D `;
-      result += days;
-    }
+    const days = eventDuration.days() > 0 ? `${eventDuration.format('DD')}D ` : '';
+    const hours = `${String(eventDuration.hours()).padStart(2, '0')}H `;
+    const minutes = `${String(eventDuration.minutes()).padStart(2, '0')}M`;
 
-    if (eventDuration.hours() > 0) {
-      const hours = `${eventDuration.hours()}H `;
-      result += hours;
-    }
-
-    if (eventDuration.minutes() > 0) {
-      const minutes = `${eventDuration.minutes()}M`;
-      result += minutes;
-    }
-    return result;
+    return `${days}${hours}${minutes}`;
   };
 
   const getShortRenderTime = (date) => {
-    let hour = dayjs(date).hour();
-    let minute = dayjs(date).minute();
-    if (hour < 10) {
-      hour = `0${hour}`;
-    }
+    const hour = String(dayjs(date).hour());
+    const minute = String(dayjs(date).minute());
 
-    if (minute < 10) {
-      minute = `0${minute}`;
-    }
-
-
-    return `${hour}:${minute}`;
+    return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
   };
 
   return `<li class="trip-events__item">
@@ -76,7 +58,7 @@ const createTripItemTemplate = (event) => {
     <div class="event__type">
       <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
     </div>
-    <h3 class="event__title">${type} ${destinationName}</h3>
+    <h3 class="event__title">${type} ${he.encode(destinationName)}</h3>
     <div class="event__schedule">
       <p class="event__time">
 
@@ -87,7 +69,7 @@ const createTripItemTemplate = (event) => {
       <p class="event__duration">${getEventDuration(dateFrom, dateTo)}</p>
     </div>
     <p class="event__price">
-      &euro;&nbsp;<span class="event__price-value">${getFullEventPrice()}</span>
+      &euro;&nbsp;<span class="event__price-value">${he.encode(String(getFullEventPrice()))}</span>
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     ${createTripItemOffersList()}

@@ -281,4 +281,4 @@ const generateEvents = (amount) => {
   return events;
 };
 
-export {generateEvent, generateEvents, OPTION_TITLES, EVENT_DESTINATION_NAMES};
+export {generateEvent, generateEvents, OPTION_TITLES, EVENT_DESTINATION_NAMES, EVENT_TYPES};

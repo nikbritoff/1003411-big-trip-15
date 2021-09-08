@@ -31,9 +31,9 @@ const createSiteSortingTemplate = () => (
 );
 
 export default class SiteSorting extends AbstractView{
-  constructor() {
+  constructor(currentSortType) {
     super();
-
+    this._currentSortType = currentSortType;
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
   }
 
@@ -51,6 +51,6 @@ export default class SiteSorting extends AbstractView{
   }
 
   getTemplate() {
-    return createSiteSortingTemplate();
+    return createSiteSortingTemplate(this._currentSortType);
   }
 }

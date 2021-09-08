@@ -1,9 +1,13 @@
 import dayjs from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+dayjs.extend(isSameOrAfter);
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import Smart from './smart';
 import { EVENT_DESTINATION_NAMES, OPTION_TITLES } from '../mock/event';
 import { EVENT_FORM_MODE } from '../utils/const.js';
+import he from 'he';
+import { EVENT_TYPES } from '../mock/event';
 
 const setOptions = (options) => {
   let avialableOptions = '';
@@ -38,6 +42,28 @@ const setDestinationList = (destinationList) => {
   return `<datalist id="destination-list-1">${datalistOptions}</datalist>`;
 };
 
+const createEventTypeItemTemplate = (type, currentType) => `
+  <div class="event__type-item">
+    <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? 'checked' : ''}>
+    <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type.split('').map((symbol, index) => index === 0 ? symbol.toUpperCase() : symbol.toLowerCase()).join('')}</label>
+  </div>
+`;
+
+const createFormEventTypeTemplate = (types, currentType) => {
+  const formEventTypesTemplate = types
+    .map((type) => createEventTypeItemTemplate(type, currentType))
+    .join('');
+
+  return (`
+    <div class="event__type-list">
+      <fieldset class="event__type-group">
+        <legend class="visually-hidden">Event type</legend>
+        ${formEventTypesTemplate}
+      </fieldset>
+    </div>
+  `);
+};
+
 const createEventFormTemplate = (data, resetButtonText) => {
   const {type, destination, options, basePrice, dateFrom, dateTo, isHasOptions, isHasPictures} = data;
   const setPictures = () => {
@@ -63,78 +89,23 @@ const createEventFormTemplate = (data, resetButtonText) => {
           <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
-
-        <div class="event__type-list">
-          <fieldset class="event__type-group">
-            <legend class="visually-hidden">Event type</legend>
-
-            <div class="event__type-item">
-              <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-              <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-              <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-              <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-              <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
-              <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-              <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-              <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-              <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-              <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-              <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-            </div>
-          </fieldset>
-        </div>
+        ${createFormEventTypeTemplate(EVENT_TYPES, type)}
       </div>
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
           ${type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
         ${setDestinationList(EVENT_DESTINATION_NAMES)}
       </div>
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(dateFrom).format('DD/MM/YY HH:mm')}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${he.encode(dayjs(dateFrom).format('DD/MM/YY HH:mm'))}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(dateTo).format('DD/MM/YY HH:mm')}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${he.encode(dayjs(dateTo).format('DD/MM/YY HH:mm'))}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -142,7 +113,7 @@ const createEventFormTemplate = (data, resetButtonText) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(String(basePrice))}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -152,8 +123,8 @@ const createEventFormTemplate = (data, resetButtonText) => {
     <section class="event__details">
       ${isHasOptions() ?  setOptions(options, type) : ''}
       <section class="event__section  event__section--destination">
-        <h3 class="event__section-title  event__section-title--destination">${destination.name}</h3>
-        <p class="event__destination-description">${destination.description}</p>
+        <h3 class="event__section-title  event__section-title--destination">${he.encode(destination.name)}</h3>
+        <p class="event__destination-description">${he.encode(destination.description)}</p>
           ${isHasPictures() ? setPictures(options, type) : ''}
       </section>
     </section>
@@ -174,8 +145,10 @@ export default class TripEventForm extends Smart{
     this._priceInputHandler = this._priceInputHandler.bind(this);
 
     this._destinationInputHandler = this._destinationInputHandler.bind(this);
-    this._dateFromChangekHandler = this._dateFromChangekHandler.bind(this);
+    this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
+    this._dateToChangekHandler = this._dateToChangekHandler.bind(this);
 
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepickerDateFrom();
@@ -272,7 +245,9 @@ export default class TripEventForm extends Smart{
   restoreHandlers() {
     this._setInnerHandlers();
     this.setSubmitHandler(this._callback.editSubmit);
-    this.setEditCloseCLickHandler(this._callback.closeEditClickHandler);
+    if (this._resetButtonText !== EVENT_FORM_MODE.add) {
+      this.setEditCloseCLickHandler(this._callback.closeEditClickHandler);
+    }
     this._setDatepickerDateFrom();
     this._setDatepickerDateTo();
   }
@@ -296,13 +271,20 @@ export default class TripEventForm extends Smart{
   reset(event) {
     this.updateData(
       TripEventForm.parseDataToEvent(event),
+      this.setDeleteClickHandler(this._callback.deleteClick),
     );
   }
 
   // Datepicker
-  _dateFromChangekHandler([userData]) {
+  _dateFromChangeHandler([userData]) {
     this.updateData({
       dateFrom: dayjs([userData]).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+    }, true);
+  }
+
+  _dateToChangekHandler([userData]) {
+    this.updateData({
+      dateTo: dayjs([userData]).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
     }, true);
   }
 
@@ -317,8 +299,9 @@ export default class TripEventForm extends Smart{
       {
         dateFormat: 'd/m/y H:i',
         defaultDate: this._data.dateFrom,enableTime: true,
-        time_24hr: true,
-        onChange: this._dateFromChangekHandler, // На событие flatpickr передаём наш колбэк
+        'time_24hr': true,
+        maxDate: this._data.dateTo,
+        onChange: this._dateFromChangeHandler, // На событие flatpickr передаём наш колбэк
       },
     );
   }
@@ -334,9 +317,33 @@ export default class TripEventForm extends Smart{
       {
         dateFormat: 'd/m/y H:i',
         defaultDate: this._data.dateTo,enableTime: true,
-        time_24hr: true,
-        onChange: this._dateFromChangekHandler, // На событие flatpickr передаём наш колбэк
+        'time_24hr': true,
+        minDate: this._data.dateFrom,
+        onChange: this._dateToChangekHandler, // На событие flatpickr передаём наш колбэк
       },
     );
+  }
+
+
+  // Model
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepickerDateFrom || this._datepickerDateTo) {
+      this._datepickerDateTo.destroy();
+      this._datepickerDateTo = null;
+      this._datepickerDateFrom.destroy();
+      this._datepickerDateFrom = null;
+    }
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(TripEventForm.parseDataToEvent(this._data));
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
   }
 }

@@ -2,6 +2,8 @@ import TripEventItemView from '../view/trip-event-item.js';
 import TripEventFormView from '../view/trip-event-form.js';
 import { EVENT_FORM_MODE, MODE } from '../utils/const.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
+import { USER_ACTION, UPDATE_TYPE } from '../utils/const.js';
+import { getUpdateType } from '../utils/event.js';
 
 export default class Event {
   constructor(eventsListElement, changeData, changeMode) {
@@ -19,6 +21,7 @@ export default class Event {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleCloseEditClick = this._handleCloseEditClick.bind(this);
+    this._deleteClickHandler = this._deleteClickHandler.bind(this);
   }
 
   init(event) {
@@ -36,7 +39,8 @@ export default class Event {
     this._eventItemComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
     this._handleCloseEditClick = this._handleCloseEditClick.bind(this);
-    // this._eventFormComponent.setEditCloseCLickHandler(this._handleCloseEditClick);
+    this._eventFormComponent.setEditCloseCLickHandler(this._handleCloseEditClick);
+    this._eventFormComponent.setDeleteClickHandler(this._deleteClickHandler);
 
 
     // Проверка создавались ли компоненты ранее.
@@ -72,7 +76,6 @@ export default class Event {
   _replaceItemToForm() {
     replace(this._eventFormComponent, this._eventItemComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
-    // this._eventFormComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', this. _handleCloseEditClick);
     this._changeMode();
     this._mode = MODE.EDITING;
   }
@@ -102,6 +105,8 @@ export default class Event {
 
   _handleFavoriteClick() {
     this._changeData(
+      USER_ACTION.UPDATE_EVENT,
+      UPDATE_TYPE.PATCH,
       Object.assign(
         {},
         this._event,
@@ -120,9 +125,30 @@ export default class Event {
     this._event.dateTo = this._eventFormComponent.getElement().querySelector('#event-end-time-1').value;
   }
 
-  _handleFormSubmit(event) {
-    this._changeData(event);
+  _handleFormSubmit(update) {
+    // Здесь вызывается метод _handleViewAction
+    const isMajorUpdate =
+      this._event.dateFrom !== update.dateFrom ||
+      this._event.dateTo !== update.dateTo ||
+      this._event.basePrice !== update.basePrice ||
+      this._event.destination.name !== update.destination.name;
+
+    const isMinorUpdate = this._event.type !== update.type;
+
+    this._changeData(
+      USER_ACTION.UPDATE_EVENT,
+      getUpdateType(isMinorUpdate, isMajorUpdate),
+      update,
+    );
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._replaceFormToItem();
+  }
+
+  _deleteClickHandler(event) {
+    this._changeData(
+      USER_ACTION.DELETE_EVENT,
+      UPDATE_TYPE.MAJOR,
+      event,
+    );
   }
 }
