@@ -28,7 +28,7 @@ export default class EventNew {
 
     this._handleCancelClick = this._handleCancelClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    this._escKeyDownHandler = this._escKeyDownHandler(this);
+    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
 
   }
 
@@ -37,10 +37,13 @@ export default class EventNew {
       return;
     }
 
-    this._eventEditComponent = new TripEventFormView(DEFAULT_EVENT, EVENT_FORM_MODE.add);
+    this._eventEditComponent = new TripEventFormView(DEFAULT_EVENT, true);
+    delete this._eventFormMode;
     this._eventEditComponent.setDeleteClickHandler(this._handleCancelClick);
     this._eventEditComponent.setSubmitHandler(this._handleFormSubmit);
     render(this._eventsListElement, this._eventEditComponent, RenderPosition.AFTERBEGIN);
+
+    document.addEventListener('keydown', this._escKeyDownHandler);
   }
 
   destroy() {
@@ -51,7 +54,7 @@ export default class EventNew {
     remove(this._eventEditComponent);
     this._eventEditComponent = null;
 
-    document.removeEventListener('keydown', this._escKeyDown);
+    document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleFormSubmit(event) {
@@ -61,9 +64,9 @@ export default class EventNew {
       UPDATE_TYPE.MAJOR,
       // Временное
       Object.assign({id: nanoid()}, event),
-      // event,
     );
-    this.destroy;
+    this._eventFormMode = EVENT_FORM_MODE.edit;
+    this.destroy();
   }
 
   _handleCancelClick() {

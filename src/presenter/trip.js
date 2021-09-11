@@ -134,7 +134,9 @@ export default class Trip {
         // Обновление всей страницы
         this._clearAllEvents({resetSortType: true, resetTripInfo: true});
         this._renderInfo();
-        this._renderSort();
+        if (this._getEvents().length > 0) {
+          this._renderSort();
+        }
         this._renderEvents();
         break;
     }

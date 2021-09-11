@@ -1,6 +1,6 @@
 import TripEventItemView from '../view/trip-event-item.js';
 import TripEventFormView from '../view/trip-event-form.js';
-import { EVENT_FORM_MODE, MODE } from '../utils/const.js';
+import { MODE } from '../utils/const.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
 import { USER_ACTION, UPDATE_TYPE } from '../utils/const.js';
 import { getUpdateType } from '../utils/event.js';
@@ -32,7 +32,8 @@ export default class Event {
     const prevFormComponent = this._eventFormComponent;
 
     this._eventItemComponent = new TripEventItemView(this._event);
-    this._eventFormComponent = new TripEventFormView(this._event, EVENT_FORM_MODE.edit);
+    // this._eventFormComponent = new TripEventFormView(this._event, EVENT_FORM_MODE.edit);
+    this._eventFormComponent = new TripEventFormView(this._event);
 
     this._eventItemComponent.setEditClickHandler(this._handleEditClick);
     this._eventFormComponent.setSubmitHandler(this._handleFormSubmit);
@@ -82,13 +83,14 @@ export default class Event {
 
   _replaceFormToItem() {
     replace(this._eventItemComponent, this._eventFormComponent);
+    document.removeEventListener('keydown', this._escKeyDownHandler);
     this._mode = MODE.DEFAULT;
   }
 
   _escKeyDownHandler(evt) {
     if (evt.key === 'Esc' || evt.key === 'Escape') {
       evt.preventDefault();
-      this._eventFormComponent.reset(this._event);
+      this._eventFormComponent.reset(this._event, true);
       document.removeEventListener('keydown', this._escKeyDownHandler);
       this._replaceFormToItem();
     }
@@ -100,7 +102,7 @@ export default class Event {
 
   _handleCloseEditClick() {
     this._replaceFormToItem();
-    document.removeEventListener('keydown', this._escKeyDownHandler);
+    // document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleFavoriteClick() {

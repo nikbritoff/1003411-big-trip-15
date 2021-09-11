@@ -64,7 +64,7 @@ const createFormEventTypeTemplate = (types, currentType) => {
   `);
 };
 
-const createEventFormTemplate = (data, resetButtonText) => {
+const createEventFormTemplate = (data, isNew) => {
   const {type, destination, options, basePrice, dateFrom, dateTo, isHasOptions, isHasPictures} = data;
   const setPictures = () => {
     let images = '';
@@ -117,8 +117,8 @@ const createEventFormTemplate = (data, resetButtonText) => {
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">${resetButtonText}</button>
-      ${data.isEditMode() ? '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>' : ''}
+      <button class="event__reset-btn" type="reset">${isNew ? EVENT_FORM_MODE.add : EVENT_FORM_MODE.edit}</button>
+      ${isNew ? '' : '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>'}
     </header>
     <section class="event__details">
       ${isHasOptions() ?  setOptions(options, type) : ''}
@@ -133,9 +133,9 @@ const createEventFormTemplate = (data, resetButtonText) => {
 };
 
 export default class TripEventForm extends Smart{
-  constructor(event, mode) {
+  constructor(event, isNew = false) {
     super();
-    this._resetButtonText = mode;
+    this._isNew = isNew;
     this._datepickerDateFrom = null;
     this._datepickerDateTo = null;
     this._data = TripEventForm.parseEventToData(event, this._resetButtonText);
@@ -156,7 +156,7 @@ export default class TripEventForm extends Smart{
   }
 
   getTemplate() {
-    return createEventFormTemplate(this._data, this._resetButtonText);
+    return createEventFormTemplate(this._data, this._isNew);
   }
 
   _editSubmitHandler(evt) {
@@ -181,7 +181,7 @@ export default class TripEventForm extends Smart{
 
   // VIEW 6
 
-  static parseEventToData(event, mode) {
+  static parseEventToData(event) {
     return Object.assign(
       {},
       event,
@@ -191,9 +191,6 @@ export default class TripEventForm extends Smart{
         },
         isHasPictures: function() {
           return event.destination.pictures.length !== 0;
-        },
-        isEditMode: function() {
-          return mode === EVENT_FORM_MODE.edit;
         },
       },
     );
@@ -210,12 +207,15 @@ export default class TripEventForm extends Smart{
 
   _eventTypeListClickHandler(evt) {
     evt.preventDefault();
-    const selectedType = evt.target.previousElementSibling.value;
-    const newOptions = OPTION_TITLES[selectedType] !== undefined ? OPTION_TITLES[selectedType].options : [];
-    this.updateData({
-      type: selectedType,
-      options: newOptions,
-    }, false);
+
+    if (evt.target.tagName === 'LABEL') {
+      const selectedType = evt.target.previousElementSibling.value;
+      const newOptions = OPTION_TITLES[selectedType] !== undefined ? OPTION_TITLES[selectedType].options : [];
+      this.updateData({
+        type: selectedType,
+        options: newOptions,
+      }, false);
+    }
   }
 
   _destinationInputHandler(evt) {
@@ -245,11 +245,9 @@ export default class TripEventForm extends Smart{
   restoreHandlers() {
     this._setInnerHandlers();
     this.setSubmitHandler(this._callback.editSubmit);
-    if (this._resetButtonText !== EVENT_FORM_MODE.add) {
-      this.setEditCloseCLickHandler(this._callback.closeEditClickHandler);
-    }
     this._setDatepickerDateFrom();
     this._setDatepickerDateTo();
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   _setInnerHandlers() {
@@ -268,10 +266,10 @@ export default class TripEventForm extends Smart{
     }, true);
   }
 
-  reset(event) {
+  reset(event, justUpdating = false) {
     this.updateData(
       TripEventForm.parseDataToEvent(event),
-      this.setDeleteClickHandler(this._callback.deleteClick),
+      justUpdating,
     );
   }
 
