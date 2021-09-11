@@ -4,19 +4,21 @@ import { remove, render, RenderPosition } from '../utils/render.js';
 import { USER_ACTION, UPDATE_TYPE } from '../utils/const.js';
 import dayjs from 'dayjs';
 import { EVENT_FORM_MODE } from '../utils/const.js';
+import { EVENT_DESTINATION_NAMES, EVENT_TYPES, DESTINATION_INFO_DESCRIPTIONS } from '../mock/event.js';
+import { getRandomIntOfRange } from '../mock/utils.js';
 
 const DEFAULT_EVENT = {
-  type: 'flight',
+  type: EVENT_TYPES[getRandomIntOfRange(0, EVENT_TYPES.length - 1)],
   destination: {
-    name: 'Rome',
-    description: 'Aliquam id orci ut lectus varius viverra.',
+    name: EVENT_DESTINATION_NAMES[getRandomIntOfRange(0, EVENT_DESTINATION_NAMES.length - 1)],
+    description: DESTINATION_INFO_DESCRIPTIONS[getRandomIntOfRange(0, DESTINATION_INFO_DESCRIPTIONS.length - 1)],
     pictures: [],
   },
   basePrice: 0,
   isFavorite: false,
   dateFrom: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
   options: [],
-  dateTo: '2222',
+  dateTo: dayjs().add(1, 'day').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
 };
 
 export default class EventNew {
