@@ -4,7 +4,7 @@ import { remove, render, RenderPosition } from '../utils/render.js';
 import { USER_ACTION, UPDATE_TYPE } from '../utils/const.js';
 import dayjs from 'dayjs';
 import { EVENT_FORM_MODE } from '../utils/const.js';
-import { EVENT_DESTINATION_NAMES, EVENT_TYPES, DESTINATION_INFO_DESCRIPTIONS } from '../mock/event.js';
+import { EVENT_DESTINATION_NAMES, EVENT_TYPES, DESTINATION_INFO_DESCRIPTIONS, OPTION_TITLES, PICTURE_DESCRIPTIONS } from '../mock/event.js';
 import { getRandomIntOfRange } from '../mock/utils.js';
 
 const DEFAULT_EVENT = {
@@ -20,6 +20,19 @@ const DEFAULT_EVENT = {
   options: [],
   dateTo: dayjs().add(1, 'day').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
 };
+
+// Проверка на существование опций для текущего типа событий
+if (OPTION_TITLES[DEFAULT_EVENT.type]) {
+  DEFAULT_EVENT.options = OPTION_TITLES[DEFAULT_EVENT.type].options;
+}
+
+// Назначение картинок
+if (getRandomIntOfRange(0, 2)) {
+  DEFAULT_EVENT.destination.pictures = new Array(getRandomIntOfRange(1, 6)).fill('').map(() => ({
+    src: `http://picsum.photos/248/152?r=${getRandomIntOfRange(1, 25)}`,
+    description: PICTURE_DESCRIPTIONS[getRandomIntOfRange(0, PICTURE_DESCRIPTIONS.length)],
+  }));
+}
 
 export default class EventNew {
   constructor(eventsListElement, changeData) {

@@ -138,7 +138,7 @@ export default class TripEventForm extends Smart{
     this._isNew = isNew;
     this._datepickerDateFrom = null;
     this._datepickerDateTo = null;
-    this._data = TripEventForm.parseEventToData(event, this._resetButtonText);
+    this._data = TripEventForm.parseEventToData(event);
     this._editSubmitHandler = this._editSubmitHandler.bind(this);
     this._editCloseClickHandler = this._editCloseClickHandler.bind(this);
     this._eventTypeListClickHandler = this._eventTypeListClickHandler.bind(this);
@@ -153,6 +153,8 @@ export default class TripEventForm extends Smart{
     this._setInnerHandlers();
     this._setDatepickerDateFrom();
     this._setDatepickerDateTo();
+
+    this._updateDataFromEvent = this._updateDataFromEvent.bind(this);
   }
 
   getTemplate() {
@@ -205,16 +207,28 @@ export default class TripEventForm extends Smart{
     return data;
   }
 
+  // Этот метод создан для того, чтобы повторно вызывать проверку isHasOptions и isHasPictures
+  // Иначе результат проверки не обнолялся и элементы для опций не создавались
+  _updateDataFromEvent() {
+    this._tempData = TripEventForm.parseDataToEvent(this._data);
+    this._data = TripEventForm.parseEventToData(this._tempData);
+    this.updateData(this._data, false);
+    delete this._tempData;
+  }
+
   _eventTypeListClickHandler(evt) {
     evt.preventDefault();
 
     if (evt.target.tagName === 'LABEL') {
       const selectedType = evt.target.previousElementSibling.value;
       const newOptions = OPTION_TITLES[selectedType] !== undefined ? OPTION_TITLES[selectedType].options : [];
+      // Чтобы избежать повторной перерисовки страницы здесь мы обновляем только данные
       this.updateData({
         type: selectedType,
         options: newOptions,
-      }, false);
+      }, true);
+
+      this._updateDataFromEvent();
     }
   }
 
