@@ -237,16 +237,19 @@ export default class TripEventForm extends Smart{
     evt.preventDefault();
     const selectedDestinationName = evt.target.value;
     input.blur();
-
-    const description = this._data.destination.description;
-    const pictures = this._data.destination.pictures;
-    this.updateData({
-      destination: {
-        name: selectedDestinationName,
-        description: description,
-        pictures: pictures,
-      },
-    }, false);
+    // Проверка на наличие города в списке назначений
+    const isInDestinations = EVENT_DESTINATION_NAMES.some((destination) => destination === selectedDestinationName);
+    if (isInDestinations) {
+      const description = this._data.destination.description;
+      const pictures = this._data.destination.pictures;
+      this.updateData({
+        destination: {
+          name: selectedDestinationName,
+          description: description,
+          pictures: pictures,
+        },
+      }, false);
+    }
   }
 
   // Этот метод добавлен, чтобы очищать инпут, так как иначе datalist не отображается.
@@ -272,11 +275,11 @@ export default class TripEventForm extends Smart{
     this.getElement().querySelector('.event__input--destination').addEventListener('click', this._destinationClickHandler);
   }
 
+  // Все нечисловые символы удаляются при сохранении
   _priceInputHandler(evt) {
     evt.preventDefault();
-
     this.updateData({
-      basePrice: Number(evt.target.value),
+      basePrice: Number(evt.target.value.replace(/[^\d]/g, '')),
     }, true);
   }
 
