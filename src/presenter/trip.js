@@ -8,10 +8,11 @@ import { SORT_TYPE, UPDATE_TYPE, USER_ACTION, FILTER_TYPE } from '../utils/const
 import { sortDurationUp, sortPriceUp } from '../utils/event.js';
 import { filter } from '../utils/filter.js';
 import EventNewPresenter from './event-new.js';
+import LoadingView from '../view/loading.js';
 
 
 export default class Trip {
-  constructor(siteTripMainElement, tripEventsElement, eventsModel, filterModel) {
+  constructor(siteTripMainElement, tripEventsElement, eventsModel, filterModel, api) {
     this._eventsModel = eventsModel;
     this._siteTripMainComponent = siteTripMainElement;
     this._tripEventsComponent = tripEventsElement;
@@ -25,6 +26,10 @@ export default class Trip {
     this._filterType = FILTER_TYPE.EVERYTHING;
     this._currentSortType = SORT_TYPE.DEFAULT;
     this._noEventsComponent = null;
+    this._isLoading = true;
+    this._api = api;
+
+    this._loadingComponent  = new LoadingView();
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
@@ -86,6 +91,11 @@ export default class Trip {
   }
 
   _renderEvents() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     if (this._getEvents().length === 0) {
       this._renderNoEvents();
     } else {
@@ -109,10 +119,11 @@ export default class Trip {
     // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
     // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
     // update - обновленные данные
-    // console.log('biew action', this._eventsModel);
     switch (actionType) {
       case USER_ACTION.UPDATE_EVENT:
-        this._eventsModel.updateEvent(updateType, update);
+        this._api.updateEvent(update).then((response) => {
+          this._eventsModel.updateEvent(updateType, response);
+        });
         break;
       case USER_ACTION.ADD_EVENT:
         this._eventsModel.addEvent(updateType, update);
@@ -145,6 +156,11 @@ export default class Trip {
         if (this._getEvents().length > 0) {
           this._renderSort();
         }
+        this._renderEvents();
+        break;
+      case UPDATE_TYPE.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
         this._renderEvents();
         break;
     }
@@ -205,5 +221,9 @@ export default class Trip {
     this._currentSortType = SORT_TYPE.DEFAULT;
     this._filterModel.setFilter(UPDATE_TYPE.MAJOR, FILTER_TYPE.EVERYTHING);
     this._EventNewPresenter.init();
+  }
+
+  _renderLoading() {
+    render(this._eventsListComponent, this._loadingComponent, RenderPosition.BEFOREEND);
   }
 }

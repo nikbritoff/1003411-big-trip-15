@@ -1,29 +1,26 @@
-import { generateEvents } from './mock/event.js';
 import TripPresenter from './presenter/trip.js';
 import EventsModel from './model/events.js';
 import FilterModel from './model/filter.js';
 import FilterPresenter from './presenter/filter.js';
-import { MENU_ITEM } from './utils/const.js';
+import { MENU_ITEM, UPDATE_TYPE } from './utils/const.js';
 import SiteMenuView from './view/site-menu.js';
 import { RenderPosition, render, remove } from './utils/render.js';
 import StatisticsView from './view/statistics.js';
+import Api from './api/api.js';
 
-const TRIP_EVENTS_AMOUNT = 5;
-const data = generateEvents(TRIP_EVENTS_AMOUNT);
+const END_POINT = 'https://15.ecmascript.pages.academy/big-trip/';
+const AUTHORIZATION = 'Basic 8k69hjl853avfr559';
+const api = new Api(END_POINT, AUTHORIZATION);
 
 const pageBodyContainerElement = document.querySelector('main .page-body__container');
 const siteTripMainElement = document.querySelector('.trip-main');
 const siteTripEvents = document.querySelector('.trip-events');
 // Model
 const eventsModel = new EventsModel();
-eventsModel.setEvents(data);
-const siteMenuComponent = new SiteMenuView();
-
-render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
 
 const filterModel = new FilterModel();
 // Отрисовка хэдера
-const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEvents, eventsModel, filterModel);
+const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEvents, eventsModel, filterModel, api);
 tripPresenter.init();
 
 const filterPresenter = new FilterPresenter(
@@ -42,6 +39,8 @@ document.querySelector('.trip-main__event-add-btn ').addEventListener('click', (
 });
 
 let statiscticsComponent = null;
+
+const siteMenuComponent = new SiteMenuView();
 
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
@@ -65,3 +64,13 @@ const handleSiteMenuClick = (menuItem) => {
 };
 
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+
+api.getEvents()
+  .then((events) => {
+    eventsModel.setEvents(UPDATE_TYPE.INIT, events);
+    render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
+  })
+  .catch(() => {
+    eventsModel.setEvents(UPDATE_TYPE.INIT, []);
+    render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
+  });

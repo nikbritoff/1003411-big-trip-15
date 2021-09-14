@@ -6,8 +6,10 @@ export default class Events extends AbstractObserver {
     this._events = [];
   }
 
-  setEvents(events) {
+  setEvents(updateType, events) {
     this._events = events.slice();
+
+    this._notify(updateType);
   }
 
   getEvents() {
@@ -52,5 +54,49 @@ export default class Events extends AbstractObserver {
     ];
 
     this._notify(updateType);
+  }
+
+  static adaptToClient(event) {
+    const adaptedEvent = Object.assign(
+      {},
+      event,
+      {
+        basePrice: event.base_price,
+        dateFrom: event.date_from,
+        dateTo: event.date_to,
+        isFavorite:  event.is_favorite,
+        options: event.offers,
+      },
+    );
+
+    delete adaptedEvent['base_price'];
+    delete adaptedEvent['date_from'];
+    delete adaptedEvent['date_to'];
+    delete adaptedEvent['is_favorite'];
+    delete adaptedEvent['offers'];
+
+    return adaptedEvent;
+  }
+
+  static adaptToServer(event) {
+    const adaptedEvent = Object.assign(
+      {},
+      event,
+      {
+        'base_price': event.basePrice,
+        'date_from': event.dateFrom,
+        'date_to': event.dateTo,
+        'is_favorite': event.isFavorite,
+        'offers': event.options,
+      },
+    );
+
+    delete adaptedEvent.basePrice;
+    delete adaptedEvent.dateFrom;
+    delete adaptedEvent.dateTo;
+    delete adaptedEvent.isFavorite;
+    delete adaptedEvent.options;
+
+    return adaptedEvent;
   }
 }
