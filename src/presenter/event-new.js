@@ -4,20 +4,35 @@ import { remove, render, RenderPosition } from '../utils/render.js';
 import { USER_ACTION, UPDATE_TYPE } from '../utils/const.js';
 import dayjs from 'dayjs';
 import { EVENT_FORM_MODE } from '../utils/const.js';
+import { EVENT_DESTINATION_NAMES, EVENT_TYPES, DESTINATION_INFO_DESCRIPTIONS, OPTION_TITLES, PICTURE_DESCRIPTIONS } from '../mock/event.js';
+import { getRandomIntOfRange } from '../mock/utils.js';
 
 const DEFAULT_EVENT = {
-  type: 'flight',
+  type: EVENT_TYPES[getRandomIntOfRange(0, EVENT_TYPES.length - 1)],
   destination: {
-    name: 'Rome',
-    description: 'Aliquam id orci ut lectus varius viverra.',
+    name: EVENT_DESTINATION_NAMES[getRandomIntOfRange(0, EVENT_DESTINATION_NAMES.length - 1)],
+    description: DESTINATION_INFO_DESCRIPTIONS[getRandomIntOfRange(0, DESTINATION_INFO_DESCRIPTIONS.length - 1)],
     pictures: [],
   },
   basePrice: 0,
   isFavorite: false,
   dateFrom: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
   options: [],
-  dateTo: '2222',
+  dateTo: dayjs().add(1, 'day').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
 };
+
+// Проверка на существование опций для текущего типа событий
+if (OPTION_TITLES[DEFAULT_EVENT.type]) {
+  DEFAULT_EVENT.options = OPTION_TITLES[DEFAULT_EVENT.type].options;
+}
+
+// Назначение картинок
+if (getRandomIntOfRange(0, 2)) {
+  DEFAULT_EVENT.destination.pictures = new Array(getRandomIntOfRange(1, 6)).fill('').map(() => ({
+    src: `http://picsum.photos/248/152?r=${getRandomIntOfRange(1, 25)}`,
+    description: PICTURE_DESCRIPTIONS[getRandomIntOfRange(0, PICTURE_DESCRIPTIONS.length)],
+  }));
+}
 
 export default class EventNew {
   constructor(eventsListElement, changeData) {
@@ -28,7 +43,7 @@ export default class EventNew {
 
     this._handleCancelClick = this._handleCancelClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    this._escKeyDownHandler = this._escKeyDownHandler(this);
+    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
 
   }
 
@@ -37,10 +52,13 @@ export default class EventNew {
       return;
     }
 
-    this._eventEditComponent = new TripEventFormView(DEFAULT_EVENT, EVENT_FORM_MODE.add);
+    this._eventEditComponent = new TripEventFormView(DEFAULT_EVENT, true);
+    delete this._eventFormMode;
     this._eventEditComponent.setDeleteClickHandler(this._handleCancelClick);
     this._eventEditComponent.setSubmitHandler(this._handleFormSubmit);
     render(this._eventsListElement, this._eventEditComponent, RenderPosition.AFTERBEGIN);
+
+    document.addEventListener('keydown', this._escKeyDownHandler);
   }
 
   destroy() {
@@ -51,7 +69,7 @@ export default class EventNew {
     remove(this._eventEditComponent);
     this._eventEditComponent = null;
 
-    document.removeEventListener('keydown', this._escKeyDown);
+    document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleFormSubmit(event) {
@@ -61,9 +79,9 @@ export default class EventNew {
       UPDATE_TYPE.MAJOR,
       // Временное
       Object.assign({id: nanoid()}, event),
-      // event,
     );
-    this.destroy;
+    this._eventFormMode = EVENT_FORM_MODE.edit;
+    this.destroy();
   }
 
   _handleCancelClick() {
