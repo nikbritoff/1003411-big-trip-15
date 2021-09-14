@@ -1,5 +1,4 @@
 import { RenderPosition, render, remove } from '../utils/render.js';
-import SiteMenuView from '../view/site-menu';
 import SiteEventsListView from '../view/trip-events-list';
 import TripInfoView from '../view/trip-info';
 import SiteSortingView from '../view/site-sorting';
@@ -19,11 +18,8 @@ export default class Trip {
     this._siteNavigationComponent = this._siteTripMainComponent.querySelector('.trip-controls__navigation');
     this._filterModel = filterModel;
     this._tripInfoComponent = null;
-    this._siteMenuComponent = new SiteMenuView();
     this._tripSortingComponent = null;
     this._eventsListComponent = new SiteEventsListView();
-
-    //
 
     this._eventPresenter = new Map();
     this._filterType = FILTER_TYPE.EVERYTHING;
@@ -36,19 +32,31 @@ export default class Trip {
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
     this._EventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._handleViewAction);
-    this._eventsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
 
     this.crateEvent = this.crateEvent.bind(this);
+    this.isHidden = false;
   }
 
   init() {
-    // Отрисовка компонентов на странице
-    render(this._siteNavigationComponent, this._siteMenuComponent, RenderPosition.BEFOREEND);
+    this.isHidden = false;
     this._renderSort();
     render(this._tripEventsComponent, this._eventsListComponent, RenderPosition.BEFOREEND);
     this._renderInfo();
+
+    this._eventsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
     this._renderEvents();
+  }
+
+  destroy() {
+    this._clearAllEvents(({resetSortType: true, resetTripInfo: true}));
+
+    remove(this._eventsListComponent);
+
+    this._eventsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+    this.isHidden = true;
   }
 
   _renderInfo() {
@@ -197,6 +205,5 @@ export default class Trip {
     this._currentSortType = SORT_TYPE.DEFAULT;
     this._filterModel.setFilter(UPDATE_TYPE.MAJOR, FILTER_TYPE.EVERYTHING);
     this._EventNewPresenter.init();
-    // console.log('create ', this._EventNewPresenter);
   }
 }

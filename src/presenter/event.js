@@ -32,7 +32,6 @@ export default class Event {
     const prevFormComponent = this._eventFormComponent;
 
     this._eventItemComponent = new TripEventItemView(this._event);
-    // this._eventFormComponent = new TripEventFormView(this._event, EVENT_FORM_MODE.edit);
     this._eventFormComponent = new TripEventFormView(this._event);
 
     this._eventItemComponent.setEditClickHandler(this._handleEditClick);
@@ -102,7 +101,6 @@ export default class Event {
 
   _handleCloseEditClick() {
     this._replaceFormToItem();
-    // document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleFavoriteClick() {
