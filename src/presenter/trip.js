@@ -10,6 +10,8 @@ import { filter } from '../utils/filter.js';
 import EventNewPresenter from './event-new.js';
 import LoadingView from '../view/loading.js';
 
+import AddNewEventView from '../view/site-add-new-event.js';
+
 
 export default class Trip {
   constructor(siteTripMainElement, tripEventsElement, eventsModel, filterModel, api) {
@@ -21,6 +23,7 @@ export default class Trip {
     this._tripInfoComponent = null;
     this._tripSortingComponent = null;
     this._eventsListComponent = new SiteEventsListView();
+    this._addNewEventButtonComponent = new AddNewEventView();
 
     this._eventPresenter = new Map();
     this._filterType = FILTER_TYPE.EVERYTHING;
@@ -38,15 +41,15 @@ export default class Trip {
 
     this._EventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._handleViewAction);
 
-    this.crateEvent = this.crateEvent.bind(this);
+    this.createEvent = this.createEvent.bind(this);
     this.isHidden = false;
   }
 
   init() {
     this.isHidden = false;
     this._renderSort();
+    this._renderAddNewEvent();
     render(this._tripEventsComponent, this._eventsListComponent, RenderPosition.BEFOREEND);
-    this._renderInfo();
 
     this._eventsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
@@ -55,7 +58,7 @@ export default class Trip {
   }
 
   destroy() {
-    this._clearAllEvents(({resetSortType: true, resetTripInfo: true}));
+    this._clearAllEvents(({resetSortType: true}));
 
     remove(this._eventsListComponent);
 
@@ -66,6 +69,7 @@ export default class Trip {
 
   _renderInfo() {
     if (this._tripInfoComponent !== null) {
+      remove(this._tripInfoComponent);
       this._tripInfoComponent = null;
     }
 
@@ -82,6 +86,11 @@ export default class Trip {
     this._tripSortingComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
 
     render(this._tripEventsComponent, this._tripSortingComponent, RenderPosition.AFTERBEGIN);
+  }
+
+  _renderAddNewEvent() {
+    render(this._siteTripMainComponent, this._addNewEventButtonComponent, RenderPosition.BEFOREEND);
+    this._addNewEventButtonComponent.setAddNewButtonClickHabdler(this.createEvent);
   }
 
   _renderEvent(event) {
@@ -126,10 +135,16 @@ export default class Trip {
         });
         break;
       case USER_ACTION.ADD_EVENT:
-        this._eventsModel.addEvent(updateType, update);
+        // this._eventsModel.addEvent(updateType, update);
+        this._api.addEvent(update).then((response) => {
+          this._eventsModel.addEvent(updateType, response);
+        });
         break;
       case USER_ACTION.DELETE_EVENT:
-        this._eventsModel.deleteEvent(updateType, update);
+        // this._eventsModel.deleteEvent(updateType, update);
+        this._api.deleteEvent(update).then(() => {
+          this._eventsModel.deleteEvent(updateType, update);
+        });
         break;
     }
   }
@@ -151,8 +166,7 @@ export default class Trip {
         break;
       case UPDATE_TYPE.MAJOR:
         // Обновление всей страницы
-        this._clearAllEvents({resetSortType: true, resetTripInfo: true});
-        this._renderInfo();
+        this._clearAllEvents({resetSortType: true});
         if (this._getEvents().length > 0) {
           this._renderSort();
         }
@@ -197,7 +211,7 @@ export default class Trip {
     return filteredEvents;
   }
 
-  _clearAllEvents({resetSortType = false, resetTripInfo = false} = {}) {
+  _clearAllEvents({resetSortType = false} = {}) {
     this._EventNewPresenter.destroy();
     this._eventPresenter.forEach((presenter) => presenter.destroy());
     this._eventPresenter.clear();
@@ -211,13 +225,13 @@ export default class Trip {
       remove(this._tripSortingComponent);
       this._currentSortType = SORT_TYPE.DEFAULT;
     }
-
-    if (resetTripInfo) {
-      remove(this._tripInfoComponent);
-    }
   }
 
-  crateEvent() {
+  createEvent() {
+    if (this.isHidden) {
+      this.init();
+    }
+
     this._currentSortType = SORT_TYPE.DEFAULT;
     this._filterModel.setFilter(UPDATE_TYPE.MAJOR, FILTER_TYPE.EVERYTHING);
     this._EventNewPresenter.init();

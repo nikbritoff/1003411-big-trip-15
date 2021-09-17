@@ -239,6 +239,7 @@ const createStatisticsTemplate = () => (
 export default class Statistics extends Smart{
   constructor(eventsModel) {
     super();
+    this.isHidden = true;
     this._eventsModel = eventsModel;
     this._events = this._eventsModel.getEvents();
 

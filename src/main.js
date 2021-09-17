@@ -7,10 +7,23 @@ import SiteMenuView from './view/site-menu.js';
 import { RenderPosition, render, remove } from './utils/render.js';
 import StatisticsView from './view/statistics.js';
 import Api from './api/api.js';
+import AddNewEventView from './view/site-add-new-event.js';
+
+import TripInfoPresenter from './presenter/trip-info.js';
 
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip/';
-const AUTHORIZATION = 'Basic 8k69hjl853avfr559';
+const AUTHORIZATION = 'Basic 8k69hjl853avfr5590';
 const api = new Api(END_POINT, AUTHORIZATION);
+// Test
+api.getDestinations()
+  .then((destinations) => {
+    // console.log(destinations);
+  });
+
+api.getOptions()
+  .then((options) => {
+    // console.log(options);
+  });
 
 const pageBodyContainerElement = document.querySelector('main .page-body__container');
 const siteTripMainElement = document.querySelector('.trip-main');
@@ -20,6 +33,7 @@ const eventsModel = new EventsModel();
 
 const filterModel = new FilterModel();
 // Отрисовка хэдера
+
 const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEvents, eventsModel, filterModel, api);
 tripPresenter.init();
 
@@ -28,16 +42,6 @@ const filterPresenter = new FilterPresenter(
   filterModel);
 filterPresenter.init();
 
-document.querySelector('.trip-main__event-add-btn ').addEventListener('click', (evt) => {
-  evt.preventDefault();
-
-  if (tripPresenter.isHidden === true) {
-    tripPresenter.init();
-  }
-  // Сюда передать коллбэк презентера трипа по созданию нового ивента
-  tripPresenter.crateEvent();
-});
-
 let statiscticsComponent = null;
 
 const siteMenuComponent = new SiteMenuView();
@@ -45,11 +49,12 @@ const siteMenuComponent = new SiteMenuView();
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
     case MENU_ITEM.EVENTS:
-      siteMenuComponent.setActiveMenuItem(menuItem);
       // Показать все точки маршрута
-      tripPresenter.init();
-      // Скрыть статистику
-      remove(statiscticsComponent);
+      if (tripPresenter.isHidden) {
+        tripPresenter.init();
+        siteMenuComponent.setActiveMenuItem(menuItem);
+        remove(statiscticsComponent);
+      }
 
       break;
     case MENU_ITEM.STATISTICS:
@@ -57,6 +62,7 @@ const handleSiteMenuClick = (menuItem) => {
       // Скрыть точки маршрута
       tripPresenter.destroy();
       // Показать статистику
+      remove(statiscticsComponent);
       statiscticsComponent = new StatisticsView(eventsModel);
       render(pageBodyContainerElement, statiscticsComponent, RenderPosition.BEFOREEND);
       break;
@@ -74,3 +80,6 @@ api.getEvents()
     eventsModel.setEvents(UPDATE_TYPE.INIT, []);
     render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
   });
+
+const tripInfoPresenter = new TripInfoPresenter(siteTripMainElement, eventsModel);
+tripInfoPresenter.init();

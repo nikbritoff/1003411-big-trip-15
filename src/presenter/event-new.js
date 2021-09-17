@@ -1,5 +1,4 @@
 import TripEventFormView from '../view/trip-event-form.js';
-import { nanoid } from 'nanoid';
 import { remove, render, RenderPosition } from '../utils/render.js';
 import { USER_ACTION, UPDATE_TYPE } from '../utils/const.js';
 import dayjs from 'dayjs';
@@ -22,9 +21,9 @@ const DEFAULT_EVENT = {
 };
 
 // Проверка на существование опций для текущего типа событий
-if (OPTION_TITLES[DEFAULT_EVENT.type]) {
-  DEFAULT_EVENT.options = OPTION_TITLES[DEFAULT_EVENT.type].options;
-}
+// if (OPTION_TITLES[DEFAULT_EVENT.type]) {
+//   DEFAULT_EVENT.options = OPTION_TITLES[DEFAULT_EVENT.type].options;
+// }
 
 // Назначение картинок
 if (getRandomIntOfRange(0, 2)) {
@@ -77,8 +76,7 @@ export default class EventNew {
     this._changeData(
       USER_ACTION.ADD_EVENT,
       UPDATE_TYPE.MAJOR,
-      // Временное
-      Object.assign({id: nanoid()}, event),
+      event,
     );
     this._eventFormMode = EVENT_FORM_MODE.edit;
     this.destroy();

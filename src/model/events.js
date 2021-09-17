@@ -87,7 +87,8 @@ export default class Events extends AbstractObserver {
         'date_from': event.dateFrom,
         'date_to': event.dateTo,
         'is_favorite': event.isFavorite,
-        'offers': event.options,
+        // 'offers': event.options,
+        'offers': [],
       },
     );
 
