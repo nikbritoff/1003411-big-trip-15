@@ -34,9 +34,11 @@ if (getRandomIntOfRange(0, 2)) {
 }
 
 export default class EventNew {
-  constructor(eventsListElement, changeData) {
+  constructor(eventsListElement, changeData, destinations) {
     this._eventsListElement = eventsListElement;
     this._changeData = changeData;
+
+    this._destinations = destinations;
 
     this._eventEditComponent = null;
 
@@ -47,11 +49,13 @@ export default class EventNew {
   }
 
   init() {
+  // init(event) {
     if (this._eventEditComponent !== null) {
       return;
     }
 
-    this._eventEditComponent = new TripEventFormView(DEFAULT_EVENT, true);
+    // this._eventEditComponent = new TripEventFormView(DEFAULT_EVENT, true);
+    this._eventEditComponent = new TripEventFormView(null, this._destinations);
     delete this._eventFormMode;
     this._eventEditComponent.setDeleteClickHandler(this._handleCancelClick);
     this._eventEditComponent.setSubmitHandler(this._handleFormSubmit);

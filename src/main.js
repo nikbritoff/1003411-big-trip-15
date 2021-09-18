@@ -7,9 +7,11 @@ import SiteMenuView from './view/site-menu.js';
 import { RenderPosition, render, remove } from './utils/render.js';
 import StatisticsView from './view/statistics.js';
 import Api from './api/api.js';
-import AddNewEventView from './view/site-add-new-event.js';
-
 import TripInfoPresenter from './presenter/trip-info.js';
+
+import { generateEvent, generateEvents, BACKEND_OFFERS, BACKEND_DESTINATIONS } from './mock/event.js';
+// const data = generateEvents(10);
+// console.log(data);
 
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip/';
 const AUTHORIZATION = 'Basic 8k69hjl853avfr5590';
@@ -17,12 +19,20 @@ const api = new Api(END_POINT, AUTHORIZATION);
 // Test
 api.getDestinations()
   .then((destinations) => {
-    // console.log(destinations);
+    const backendDestinations = destinations;
+    console.log(backendDestinations);
+  })
+  .catch(() => {
+    const backendDestinations = [];
   });
 
 api.getOptions()
-  .then((options) => {
-    // console.log(options);
+  .then((offers) => {
+    // backendOffers = offers;
+    // const backendOffers = offers;
+  })
+  .catch(() => {
+    const backendOffers = [];
   });
 
 const pageBodyContainerElement = document.querySelector('main .page-body__container');
@@ -73,6 +83,7 @@ siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
 api.getEvents()
   .then((events) => {
+    // console.log(events);
     eventsModel.setEvents(UPDATE_TYPE.INIT, events);
     render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
   })
@@ -83,3 +94,8 @@ api.getEvents()
 
 const tripInfoPresenter = new TripInfoPresenter(siteTripMainElement, eventsModel);
 tripInfoPresenter.init();
+
+
+
+
+// console.log(backendDestinations);

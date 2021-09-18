@@ -4,17 +4,27 @@ dayjs.extend(isSameOrAfter);
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import Smart from './smart';
-import { EVENT_DESTINATION_NAMES, OPTION_TITLES } from '../mock/event';
+// import { EVENT_DESTINATION_NAMES, OPTION_TITLES } from '../mock/event';
 import { EVENT_FORM_MODE } from '../utils/const.js';
 import he from 'he';
-import { EVENT_TYPES } from '../mock/event';
+// import { EVENT_TYPES } from '../mock/event';
+import { EVENT_DESTINATION_NAMES, EVENT_TYPES, DESTINATION_INFO_DESCRIPTIONS, OPTION_TITLES, PICTURE_DESCRIPTIONS } from '../mock/event.js';
+import { getRandomIntOfRange } from '../mock/utils.js';
 
-const setOptions = (options) => {
+const setOptions = (options, selectedType, offers) => {
+  const targetOffer = offers.find((offer) => offer.type === selectedType);
+  if (!offers || !targetOffer) {
+    return '';
+  }
+
+  console.log(offers);
+  console.log(targetOffer);
   let avialableOptions = '';
-  options.forEach((currentOption, index) => {
+  targetOffer.offers.forEach((currentOption, index) => {
+    const isChecked = options.some((option) => option.title === currentOption.title);
     avialableOptions += `
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-${index}" type="checkbox" name="event-offer-comfort" ${currentOption.isChecked ? 'checked' : ''}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-${index}" type="checkbox" name="event-offer-comfort" ${isChecked ? 'checked' : ''}>
       <label class="event__offer-label" for="event-offer-comfort-${index}">
         <span class="event__offer-title">${currentOption.title}</span>
         &plus;&euro;&nbsp;
@@ -33,14 +43,45 @@ const setOptions = (options) => {
   }
   return avialableOptions;
 };
+// const setOptions = (options) => {
+//   let avialableOptions = '';
+//   options.forEach((currentOption, index) => {
+//     avialableOptions += `
+//     <div class="event__offer-selector">
+//       <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-${index}" type="checkbox" name="event-offer-comfort" ${currentOption.isChecked ? 'checked' : ''}>
+//       <label class="event__offer-label" for="event-offer-comfort-${index}">
+//         <span class="event__offer-title">${currentOption.title}</span>
+//         &plus;&euro;&nbsp;
+//         <span class="event__offer-price">${currentOption.price}</span>
+//       </label>
+//     </div>`;
+//   });
+//   if (avialableOptions) {
+//     return `<section class="event__section  event__section--offers">
+//       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
-const setDestinationList = (destinationList) => {
+//       <div class="event__available-offers">
+//         ${avialableOptions}
+//       </div>
+//     </section>`;
+//   }
+//   return avialableOptions;
+// };
+
+const setDestinationList = (destinations) => {
   let datalistOptions = '';
-  destinationList.forEach((city) => {
-    datalistOptions += `<option value="${city}"></option>`;
+  destinations.forEach((destination) => {
+    datalistOptions += `<option value="${destination.name}"></option>`;
   });
   return `<datalist id="destination-list-1">${datalistOptions}</datalist>`;
 };
+// const setDestinationList = (destinationList) => {
+//   let datalistOptions = '';
+//   destinationList.forEach((city) => {
+//     datalistOptions += `<option value="${city}"></option>`;
+//   });
+//   return `<datalist id="destination-list-1">${datalistOptions}</datalist>`;
+// };
 
 const createEventTypeItemTemplate = (type, currentType) => `
   <div class="event__type-item">
@@ -64,21 +105,56 @@ const createFormEventTypeTemplate = (types, currentType) => {
   `);
 };
 
-const createEventFormTemplate = (data, isNew) => {
+const setPictures = (pictures) => {
+  let images = '';
+
+  pictures.forEach((image) => {
+    images += `<img class="event__photo" src="${image.src}" alt="${image.description}">`;
+  });
+
+  return `<div class="event__photos-container">
+            <div class="event__photos-tape">
+              ${images}
+            </div>
+          </div>`;
+};
+
+const setEventDescription = (destination, isHasPictures) => {
+  if (!destination.description && isHasPictures === 0) {
+    return '';
+  } else {
+    const destinationDescription = destination.description ? `<p class="event__destination-description">${he.encode(destination.description)}</p>'` : '';
+    const destinationPictures = setPictures(destination.pictures);
+    return (
+      `<section class="event__section  event__section--destination">
+        <h3 class="event__section-title  event__section-title--destination">${he.encode(destination.name)}</h3>
+        ${destinationDescription}
+        ${destinationPictures}
+    </section>`
+    );
+  }
+};
+
+const createEventFormTemplate = (data, isNew, destinations, offers) => {
+  // console.log(EVENT_DESTINATION_NAMES);
   const {type, destination, options, basePrice, dateFrom, dateTo, isHasOptions, isHasPictures} = data;
-  const setPictures = () => {
-    let images = '';
+  //
+  //
 
-    destination.pictures.forEach((image) => {
-      images = `${images} <img class="event__photo" src="${image.src}" alt="${image.description}">`;
-    });
 
-    return `<div class="event__photos-container">
-              <div class="event__photos-tape">
-                ${images}
-              </div>
-            </div>`;
-  };
+  // const setPictures = () => {
+  //   let images = '';
+
+  //   destination.pictures.forEach((image) => {
+  //     images = `${images} <img class="event__photo" src="${image.src}" alt="${image.description}">`;
+  //   });
+
+  //   return `<div class="event__photos-container">
+  //             <div class="event__photos-tape">
+  //               ${images}
+  //             </div>
+  //           </div>`;
+  // };
 
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
@@ -97,7 +173,7 @@ const createEventFormTemplate = (data, isNew) => {
           ${type}
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
-        ${setDestinationList(EVENT_DESTINATION_NAMES)}
+        ${setDestinationList(destinations)}
       </div>
 
       <div class="event__field-group  event__field-group--time">
@@ -121,44 +197,65 @@ const createEventFormTemplate = (data, isNew) => {
       ${isNew ? '' : '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>'}
     </header>
     <section class="event__details">
-      ${isHasOptions() ?  setOptions(options, type) : ''}
-      <section class="event__section  event__section--destination">
-        <h3 class="event__section-title  event__section-title--destination">${he.encode(destination.name)}</h3>
-        <p class="event__destination-description">${he.encode(destination.description)}</p>
-          ${isHasPictures() ? setPictures(options, type) : ''}
-      </section>
+      ${isHasOptions ?  setOptions(options, type, offers) : ''}
+      ${setEventDescription(destination, isHasPictures)}
     </section>
   </form>
 </li>`;
 };
 
+const DEFAULT_EVENT = {
+  type: EVENT_TYPES[getRandomIntOfRange(0, EVENT_TYPES.length - 1)],
+  destination: {
+    name: EVENT_DESTINATION_NAMES[getRandomIntOfRange(0, EVENT_DESTINATION_NAMES.length - 1)],
+    description: DESTINATION_INFO_DESCRIPTIONS[getRandomIntOfRange(0, DESTINATION_INFO_DESCRIPTIONS.length - 1)],
+    pictures: [],
+  },
+  basePrice: 0,
+  isFavorite: false,
+  dateFrom: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+  options: [],
+  dateTo: dayjs().add(1, 'day').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+};
+
 export default class TripEventForm extends Smart{
-  constructor(event, isNew = false) {
+  // constructor(event, isNew = false) {
+  constructor(event, destinations, offers) {
     super();
-    this._isNew = isNew;
+
+    const eventData = event || DEFAULT_EVENT;
+    this._offers = offers;
+    this._destinations = destinations;
+    this._isNew = !event;
     this._datepickerDateFrom = null;
     this._datepickerDateTo = null;
-    this._data = TripEventForm.parseEventToData(event);
+    this._data = TripEventForm.parseEventToData(eventData);
     this._editSubmitHandler = this._editSubmitHandler.bind(this);
     this._editCloseClickHandler = this._editCloseClickHandler.bind(this);
     this._eventTypeListClickHandler = this._eventTypeListClickHandler.bind(this);
+
     this._priceInputHandler = this._priceInputHandler.bind(this);
 
-    this._destinationInputHandler = this._destinationInputHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._dateToChangekHandler = this._dateToChangekHandler.bind(this);
 
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
+
+    this._eventEndTimeInputHandler = this._eventEndTimeInputHandler.bind(this);
+    this._eventStartTimeInputHandler = this._eventStartTimeInputHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepickerDateFrom();
     this._setDatepickerDateTo();
 
     this._updateDataFromEvent = this._updateDataFromEvent.bind(this);
+
+    // console.log(this._offers);
   }
 
   getTemplate() {
-    return createEventFormTemplate(this._data, this._isNew);
+    return createEventFormTemplate(this._data, this._isNew, this._destinations, this._offers);
   }
 
   _editSubmitHandler(evt) {
@@ -188,15 +285,25 @@ export default class TripEventForm extends Smart{
       {},
       event,
       {
-        isHasOptions: function() {
-          return event.options.length !== 0;
-        },
-        isHasPictures: function() {
-          return event.destination.pictures.length !== 0;
-        },
+        isHasOptions: event.options.length,
+        isHasPictures: event.destination.pictures.length,
       },
     );
   }
+  // static parseEventToData(event) {
+  //   return Object.assign(
+  //     {},
+  //     event,
+  //     {
+  //       isHasOptions: function() {
+  //         return event.options.length !== 0;
+  //       },
+  //       isHasPictures: function() {
+  //         return event.destination.pictures.length !== 0;
+  //       },
+  //     },
+  //   );
+  // }
 
   static parseDataToEvent(data) {
     data = Object.assign({}, data);
@@ -227,29 +334,41 @@ export default class TripEventForm extends Smart{
         type: selectedType,
         options: newOptions,
       }, true);
+      // }, false);
 
       this._updateDataFromEvent();
     }
   }
 
-  _destinationInputHandler(evt) {
-    const input = evt.target;
+  _destinationChangeHandler(evt) {
+    // const input = evt.target;
     evt.preventDefault();
     const selectedDestinationName = evt.target.value;
-    input.blur();
+    // input.blur();
     // Проверка на наличие города в списке назначений
-    const isInDestinations = EVENT_DESTINATION_NAMES.some((destination) => destination === selectedDestinationName);
+    const destinationInputElement = this.getElement().querySelector('.event__input--destination');
+    const isInDestinations = this._destinations.some((destination) => destination.name === selectedDestinationName);
+    // const isInDestinations = EVENT_DESTINATION_NAMES.some((destination) => destination === selectedDestinationName);
+    destinationInputElement.setCustomValidity('');
     if (isInDestinations) {
-      const description = this._data.destination.description;
-      const pictures = this._data.destination.pictures;
+      const destinationInfo = this._destinations.find((destination) => destination.name === selectedDestinationName);
+      console.log('sl: ', destinationInfo);
+      // const description = this._data.destination.description;
+      const description = destinationInfo.description;
+      const pictures = destinationInfo.pictures;
+      // const pictures = this._data.destination.pictures;
       this.updateData({
         destination: {
           name: selectedDestinationName,
           description: description,
           pictures: pictures,
         },
-      }, false);
+      }, true);
+      this._updateDataFromEvent();
+    } else {
+      destinationInputElement.setCustomValidity('Пункт назначения не сооотвествует ни одному из указанным в списке');
     }
+    destinationInputElement.reportValidity();
   }
 
   // Этот метод добавлен, чтобы очищать инпут, так как иначе datalist не отображается.
@@ -270,14 +389,25 @@ export default class TripEventForm extends Smart{
   _setInnerHandlers() {
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._eventTypeListClickHandler);
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceInputHandler);
-    this.getElement().querySelector('.event__input--destination').addEventListener('input', this._destinationInputHandler);
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._destinationChangeHandler);
+
+    this.getElement().querySelector('#event-end-time-1').addEventListener('input', this._eventEndTimeInputHandler);
+    this.getElement().querySelector('#event-start-time-1').addEventListener('input', this._eventStartTimeInputHandler);
     // Это обработчик для очистки по клику
-    this.getElement().querySelector('.event__input--destination').addEventListener('click', this._destinationClickHandler);
+    // this.getElement().querySelector('.event__input--destination').addEventListener('click', this._destinationClickHandler);
   }
 
   // Все нечисловые символы удаляются при сохранении
   _priceInputHandler(evt) {
     evt.preventDefault();
+    const priceInputElement = this.getElement().querySelector('.event__input--price');
+    console.log(priceInputElement.value);
+    if (priceInputElement.value > 0) {
+      priceInputElement.setCustomValidity('');
+    } else {
+      priceInputElement.setCustomValidity('Стоимость должна быть целым положительным числом.');
+    }
+    priceInputElement.reportValidity();
     this.updateData({
       basePrice: Number(evt.target.value.replace(/[^\d]/g, '')),
     }, true);
@@ -337,6 +467,17 @@ export default class TripEventForm extends Smart{
         onChange: this._dateToChangekHandler, // На событие flatpickr передаём наш колбэк
       },
     );
+
+    //
+    this._setDatepickerDateFrom();
+  }
+
+  _eventEndTimeInputHandler() {
+    this._setDatepickerDateFrom();
+  }
+
+  _eventStartTimeInputHandler() {
+    this._setDatepickerDateTo();
   }
 
 

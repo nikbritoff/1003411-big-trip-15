@@ -10,11 +10,13 @@ import { filter } from '../utils/filter.js';
 import EventNewPresenter from './event-new.js';
 import LoadingView from '../view/loading.js';
 
+import { generateEvent, generateEvents, BACKEND_OFFERS, BACKEND_DESTINATIONS } from '../mock/event.js';
+
 import AddNewEventView from '../view/site-add-new-event.js';
 
 
 export default class Trip {
-  constructor(siteTripMainElement, tripEventsElement, eventsModel, filterModel, api) {
+  constructor(siteTripMainElement, tripEventsElement, eventsModel, filterModel, api, backendDestinations, backendOffers) {
     this._eventsModel = eventsModel;
     this._siteTripMainComponent = siteTripMainElement;
     this._tripEventsComponent = tripEventsElement;
@@ -24,6 +26,9 @@ export default class Trip {
     this._tripSortingComponent = null;
     this._eventsListComponent = new SiteEventsListView();
     this._addNewEventButtonComponent = new AddNewEventView();
+
+    this._backendOffers = backendOffers;
+    this._backendDestinations = backendDestinations;
 
     this._eventPresenter = new Map();
     this._filterType = FILTER_TYPE.EVERYTHING;
@@ -39,7 +44,7 @@ export default class Trip {
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
-    this._EventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._handleViewAction);
+    this._EventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._handleViewAction, BACKEND_DESTINATIONS);
 
     this.createEvent = this.createEvent.bind(this);
     this.isHidden = false;
@@ -94,7 +99,8 @@ export default class Trip {
   }
 
   _renderEvent(event) {
-    const eventPresenter = new EventPresenter(this._eventsListComponent, this._handleViewAction, this._handleModeChange);
+    // const eventPresenter = new EventPresenter(this._eventsListComponent, this._handleViewAction, this._handleModeChange);
+    const eventPresenter = new EventPresenter(this._eventsListComponent, this._handleViewAction, this._handleModeChange, BACKEND_DESTINATIONS, BACKEND_OFFERS);
     eventPresenter.init(event);
     this._eventPresenter.set(event.id, eventPresenter);
   }

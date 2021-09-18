@@ -24,6 +24,135 @@ const PICTURE_DESCRIPTIONS = [
   'Modern style',
 ];
 
+const BACKEND_OFFERS = [
+  {
+    type: 'taxi',
+    offers: [
+      {
+        title: 'Upgrade to comfort class',
+        price: 100,
+        isChecked: true,
+      },
+      {
+        title: 'Upgrade to bussines class',
+        price: 200,
+        isChecked: false,
+      },
+      {
+        title: 'Driver in a suit',
+        price: 300,
+        isChecked: true,
+      },
+      {
+        title: 'Choose the radio station',
+        price: 400,
+        isChecked: false,
+      },
+      {
+        title: 'White car',
+        price: 500,
+        isChecked: true,
+      },
+    ],
+  },
+  {
+    type: 'train',
+    offers: [
+      {
+        title: 'Select seat',
+        price: 10,
+        isChecked: true,
+      },
+      {
+        title: 'Warm tea or coffee',
+        price: 20,
+        isChecked: true,
+      },
+      {
+        title: 'Female wagon',
+        price: 30,
+        isChecked: false,
+      },
+      {
+        title: 'Express',
+        price: 40,
+        isChecked: false,
+      },
+      {
+        title: 'Shower',
+        price: 50,
+        isChecked: true,
+      },
+    ],
+  },
+  {
+    type: 'bus',
+    offers: [
+      {
+        title: 'Select seat',
+        price: 10,
+        isChecked: true,
+      },
+      {
+        title: 'Window seat',
+        price: 20,
+        isChecked: true,
+      },
+      {
+        title: 'Warm tea or coffee',
+        price: 30,
+        isChecked: false,
+      },
+      {
+        title: 'Express bus',
+        price: 40,
+        isChecked: false,
+      },
+      {
+        title: 'No covid sertificate',
+        price: 50,
+        isChecked: true,
+      },
+    ],
+  },
+];
+
+const BACKEND_DESTINATIONS = [
+  {
+    'description': 'Chamonix, is a beautiful city, a true asian pearl, with crowded streets.',
+    'name': 'Chamonix',
+    'pictures': [
+      {
+        'src': 'http://picsum.photos/300/200?r=0.0762563005163317',
+        'description': 'Chamonix parliament building 1',
+      },
+      {
+        'src': 'http://picsum.photos/300/200?r=0.0762563005163314',
+        'description': 'Chamonix parliament building 2',
+      },
+      {
+        'src': 'http://picsum.photos/300/200?r=0.0762563005163312',
+        'description': 'Chamonix parliament building 3',
+      },
+    ],
+  },
+  {
+    'description': 'Moscow is Best',
+    'name': 'Moscow',
+    'pictures': [],
+  },
+  {
+    'description': '',
+    'name': 'London',
+    'pictures': [
+      {
+        'src': 'http://picsum.photos/300/200?r=0.0762563005163321',
+        'description': 'London',
+      },
+    ],
+  },
+];
+
 const OPTION_TITLES = {
   taxi: {
     options: [
@@ -256,23 +385,28 @@ const generateDateFrom = () => {
 };
 
 const generateEvent = () => {
-  const eventPoint = {
-    type: generateEventType(),
-    destination: {
-      name: generateEventDestinationName(),
-      description: generateEventDestinationDescription(),
-      pictures: generateEventDestinationPitures(),
-    },
-    id: nanoid(),
+  // const type = generateEventType();
+  const type = BACKEND_OFFERS[getRandomIntOfRange(0,3)];
+  const dateFrom = generateDateFrom();
+  const destination = BACKEND_DESTINATIONS[0];
+
+  return {
     basePrice: getRandomIntOfRange(0, 3000),
+    dateFrom,
+    dateTo: dayjs(dateFrom).add(getRandomIntOfRange(1, 300), 'minute').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+
+    // destination: {
+    //   name: generateEventDestinationName(),
+    //   description: generateEventDestinationDescription(),
+    //   pictures: generateEventDestinationPitures(),
+    // },
+    destination,
+
+    id: nanoid(),
     isFavorite: Boolean(getRandomIntOfRange(0, 2)),
-    dateFrom: generateDateFrom(),
+    options: type.offers,
+    type: type.type,
   };
-
-  eventPoint.options = generateEventOptions(eventPoint.type);
-  eventPoint.dateTo = dayjs(eventPoint.dateFrom).add(getRandomIntOfRange(1, 300), 'minute').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-
-  return eventPoint;
 };
 
 const generateEvents = (amount) => {
@@ -281,4 +415,4 @@ const generateEvents = (amount) => {
   return events;
 };
 
-export {generateEvent, generateEvents, OPTION_TITLES, EVENT_DESTINATION_NAMES, EVENT_TYPES, DESTINATION_INFO_DESCRIPTIONS, PICTURE_DESCRIPTIONS};
+export {generateEvent, generateEvents, OPTION_TITLES, EVENT_DESTINATION_NAMES, EVENT_TYPES, DESTINATION_INFO_DESCRIPTIONS, PICTURE_DESCRIPTIONS, BACKEND_DESTINATIONS, BACKEND_OFFERS};

@@ -6,13 +6,16 @@ import { USER_ACTION, UPDATE_TYPE } from '../utils/const.js';
 import { getUpdateType } from '../utils/event.js';
 
 export default class Event {
-  constructor(eventsListElement, changeData, changeMode) {
+  constructor(eventsListElement, changeData, changeMode, destinations, offers) {
     this._eventsListComponent = eventsListElement;
     this._changeData = changeData;
     this._changeMode = changeMode;
 
     this._eventItemComponent = null;
     this._eventFormComponent = null;
+
+    this._offers = offers;
+    this._destinations = destinations;
 
     this._mode = MODE.DEFAULT;
 
@@ -22,6 +25,8 @@ export default class Event {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleCloseEditClick = this._handleCloseEditClick.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
+
+    // console.log(offers);
   }
 
   init(event) {
@@ -32,7 +37,7 @@ export default class Event {
     const prevFormComponent = this._eventFormComponent;
 
     this._eventItemComponent = new TripEventItemView(this._event);
-    this._eventFormComponent = new TripEventFormView(this._event);
+    this._eventFormComponent = new TripEventFormView(this._event, this._destinations, this._offers);
 
     this._eventItemComponent.setEditClickHandler(this._handleEditClick);
     this._eventFormComponent.setSubmitHandler(this._handleFormSubmit);
