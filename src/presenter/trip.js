@@ -10,7 +10,7 @@ import { filter } from '../utils/filter.js';
 import EventNewPresenter from './event-new.js';
 import LoadingView from '../view/loading.js';
 
-import { generateEvent, generateEvents, BACKEND_OFFERS, BACKEND_DESTINATIONS } from '../mock/event.js';
+import { BACKEND_OFFERS, BACKEND_DESTINATIONS } from '../mock/event.js';
 
 import AddNewEventView from '../view/site-add-new-event.js';
 

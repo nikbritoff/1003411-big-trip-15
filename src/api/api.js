@@ -62,7 +62,7 @@ export default class Api {
   }
 
   addEvent(event) {
-    console.log(event);
+    // console.log(event);
     return this._load({
       url: 'points',
       method: Method.POST,

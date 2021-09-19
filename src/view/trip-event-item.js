@@ -69,7 +69,7 @@ const createTripItemTemplate = (event) => {
       <p class="event__duration">${getEventDuration(dateFrom, dateTo)}</p>
     </div>
     <p class="event__price">
-      &euro;&nbsp;<span class="event__price-value">${he.encode(String(getFullEventPrice()))}</span>
+      &euro;&nbsp;<span class="event__price-value">${he.encode(String(basePrice))}</span>
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     ${createTripItemOffersList()}

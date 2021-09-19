@@ -9,31 +9,9 @@ import StatisticsView from './view/statistics.js';
 import Api from './api/api.js';
 import TripInfoPresenter from './presenter/trip-info.js';
 
-import { generateEvent, generateEvents, BACKEND_OFFERS, BACKEND_DESTINATIONS } from './mock/event.js';
-// const data = generateEvents(10);
-// console.log(data);
-
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip/';
 const AUTHORIZATION = 'Basic 8k69hjl853avfr5590';
 const api = new Api(END_POINT, AUTHORIZATION);
-// Test
-api.getDestinations()
-  .then((destinations) => {
-    const backendDestinations = destinations;
-    console.log(backendDestinations);
-  })
-  .catch(() => {
-    const backendDestinations = [];
-  });
-
-api.getOffers()
-  .then((offers) => {
-    // backendOffers = offers;
-    // const backendOffers = offers;
-  })
-  .catch(() => {
-    const backendOffers = [];
-  });
 
 const pageBodyContainerElement = document.querySelector('main .page-body__container');
 const siteTripMainElement = document.querySelector('.trip-main');
@@ -81,22 +59,10 @@ const handleSiteMenuClick = (menuItem) => {
 
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
-// api.getEvents()
-//   .then((events) => {
-//     // console.log(events);
-//     eventsModel.setEvents(UPDATE_TYPE.INIT, events);
-//     render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
-//   })
-//   .catch(() => {
-//     eventsModel.setEvents(UPDATE_TYPE.INIT, []);
-//     render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
-//   });
 api.getData()
   .then((serverData) => {
-    // console.log(events);
     eventsModel.setDestinations(serverData.destinations);
     eventsModel.setEvents(UPDATE_TYPE.INIT, serverData.events);
-    // tripPresenter.init();
     render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
   })
   .catch(() => {
