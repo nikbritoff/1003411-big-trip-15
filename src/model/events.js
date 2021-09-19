@@ -4,6 +4,7 @@ export default class Events extends AbstractObserver {
   constructor() {
     super();
     this._events = [];
+    this._destinations = [];
   }
 
   setEvents(updateType, events) {
@@ -14,6 +15,14 @@ export default class Events extends AbstractObserver {
 
   getEvents() {
     return this._events;
+  }
+
+  setDestinations(destinations) {
+    this._destinations = destinations;
+  }
+
+  getDestinations() {
+    return this._destinations;
   }
 
   updateEvent(updateType, update) {

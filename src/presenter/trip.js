@@ -16,7 +16,7 @@ import AddNewEventView from '../view/site-add-new-event.js';
 
 
 export default class Trip {
-  constructor(siteTripMainElement, tripEventsElement, eventsModel, filterModel, api, backendDestinations, backendOffers) {
+  constructor(siteTripMainElement, tripEventsElement, eventsModel, filterModel, api) {
     this._eventsModel = eventsModel;
     this._siteTripMainComponent = siteTripMainElement;
     this._tripEventsComponent = tripEventsElement;
@@ -27,8 +27,10 @@ export default class Trip {
     this._eventsListComponent = new SiteEventsListView();
     this._addNewEventButtonComponent = new AddNewEventView();
 
-    this._backendOffers = backendOffers;
-    this._backendDestinations = backendDestinations;
+    // this._backendOffers = backendOffers;
+    this._backendDestinations = [];
+    // this._backendOffers = backendOffers;
+    // this._backendDestinations = backendDestinations;
 
     this._eventPresenter = new Map();
     this._filterType = FILTER_TYPE.EVERYTHING;
@@ -52,6 +54,8 @@ export default class Trip {
 
   init() {
     this.isHidden = false;
+    this._backendDestinations = this._eventsModel.getDestinations();
+    console.log(this._backendDestinations);
     this._renderSort();
     this._renderAddNewEvent();
     render(this._tripEventsComponent, this._eventsListComponent, RenderPosition.BEFOREEND);
@@ -100,7 +104,7 @@ export default class Trip {
 
   _renderEvent(event) {
     // const eventPresenter = new EventPresenter(this._eventsListComponent, this._handleViewAction, this._handleModeChange);
-    const eventPresenter = new EventPresenter(this._eventsListComponent, this._handleViewAction, this._handleModeChange, BACKEND_DESTINATIONS, BACKEND_OFFERS);
+    const eventPresenter = new EventPresenter(this._eventsListComponent, this._handleViewAction, this._handleModeChange, this._backendDestinations, BACKEND_OFFERS);
     eventPresenter.init(event);
     this._eventPresenter.set(event.id, eventPresenter);
   }

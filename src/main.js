@@ -26,7 +26,7 @@ api.getDestinations()
     const backendDestinations = [];
   });
 
-api.getOptions()
+api.getOffers()
   .then((offers) => {
     // backendOffers = offers;
     // const backendOffers = offers;
@@ -45,7 +45,7 @@ const filterModel = new FilterModel();
 // Отрисовка хэдера
 
 const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEvents, eventsModel, filterModel, api);
-tripPresenter.init();
+// tripPresenter.init();
 
 const filterPresenter = new FilterPresenter(
   siteTripMainElement.querySelector('.trip-controls__filters'),
@@ -81,21 +81,33 @@ const handleSiteMenuClick = (menuItem) => {
 
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
-api.getEvents()
-  .then((events) => {
+// api.getEvents()
+//   .then((events) => {
+//     // console.log(events);
+//     eventsModel.setEvents(UPDATE_TYPE.INIT, events);
+//     render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
+//   })
+//   .catch(() => {
+//     eventsModel.setEvents(UPDATE_TYPE.INIT, []);
+//     render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
+//   });
+api.getData()
+  .then((serverData) => {
     // console.log(events);
-    eventsModel.setEvents(UPDATE_TYPE.INIT, events);
+    eventsModel.setDestinations(serverData.destinations);
+    eventsModel.setEvents(UPDATE_TYPE.INIT, serverData.events);
+    // tripPresenter.init();
     render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
   })
   .catch(() => {
     eventsModel.setEvents(UPDATE_TYPE.INIT, []);
     render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
-  });
+  })
+  .then(tripPresenter.init());
 
 const tripInfoPresenter = new TripInfoPresenter(siteTripMainElement, eventsModel);
 tripInfoPresenter.init();
-
-
+// tripPresenter.init();
 
 
 // console.log(backendDestinations);

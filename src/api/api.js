@@ -18,6 +18,22 @@ export default class Api {
     this._autorization = autorization;
   }
 
+  getData() {
+    return Promise.all([
+      this.getEvents(),
+      this.getOffers(),
+      this.getDestinations(),
+    ])
+      .then((serverData) => {
+        const [events, offers, destinations] = serverData;
+        return {
+          events,
+          offers,
+          destinations,
+        };
+      });
+  }
+
   getEvents() {
     return this._load({url: 'points'})
       .then(Api.toJSON)
@@ -29,7 +45,7 @@ export default class Api {
       .then(Api.toJSON);
   }
 
-  getOptions() {
+  getOffers() {
     return this._load({url: 'offers'})
       .then(Api.toJSON);
   }

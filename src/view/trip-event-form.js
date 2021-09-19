@@ -13,12 +13,11 @@ import { getRandomIntOfRange } from '../mock/utils.js';
 
 const setOptions = (options, selectedType, offers) => {
   const targetOffer = offers.find((offer) => offer.type === selectedType);
+
   if (!offers || !targetOffer) {
     return '';
   }
 
-  console.log(offers);
-  console.log(targetOffer);
   let avialableOptions = '';
   targetOffer.offers.forEach((currentOption, index) => {
     const isChecked = options.some((option) => option.title === currentOption.title);
@@ -69,6 +68,7 @@ const setOptions = (options, selectedType, offers) => {
 // };
 
 const setDestinationList = (destinations) => {
+  console.log(destinations);
   let datalistOptions = '';
   destinations.forEach((destination) => {
     datalistOptions += `<option value="${destination.name}"></option>`;
