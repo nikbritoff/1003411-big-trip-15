@@ -3,7 +3,6 @@ import TripEventFormView from '../view/trip-event-form.js';
 import { MODE } from '../utils/const.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
 import { USER_ACTION, UPDATE_TYPE } from '../utils/const.js';
-// import { getUpdateType } from '../utils/event.js';
 
 export default class Event {
   constructor(eventsListElement, changeData, changeMode, destinations, offers) {
@@ -25,8 +24,6 @@ export default class Event {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleCloseEditClick = this._handleCloseEditClick.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
-
-    // console.log(offers);
   }
 
   init(event) {
@@ -134,7 +131,6 @@ export default class Event {
     // Здесь вызывается метод _handleViewAction
     this._changeData(
       USER_ACTION.UPDATE_EVENT,
-      // getUpdateType(isMinorUpdate, isMajorUpdate),
       UPDATE_TYPE.MAJOR,
       update,
     );

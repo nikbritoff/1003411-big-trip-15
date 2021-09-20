@@ -80,10 +80,9 @@ const createTripItemTemplate = (event) => {
 
 export default class TripEventItem extends AbstractView{
   constructor(data) {
-    // console.log(data);
     super();
     this._data = data;
-    // Задается контекст объекта для обработчика событий
+
     this._editClickHandler = this._editClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }

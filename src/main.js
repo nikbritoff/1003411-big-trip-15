@@ -23,7 +23,6 @@ const filterModel = new FilterModel();
 // Отрисовка хэдера
 
 const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEvents, eventsModel, filterModel, api);
-// tripPresenter.init();
 
 const filterPresenter = new FilterPresenter(
   siteTripMainElement.querySelector('.trip-controls__filters'),

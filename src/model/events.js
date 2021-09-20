@@ -72,10 +72,6 @@ export default class Events extends AbstractObserver {
     this._notify(updateType);
   }
 
-  // static adaptOffersToCliens(offers) {
-
-  // }
-
   static adaptToClient(event) {
     const adaptedEvent = Object.assign(
       {},
@@ -108,7 +104,6 @@ export default class Events extends AbstractObserver {
         'date_to': event.dateTo,
         'is_favorite': event.isFavorite,
         'offers': event.options,
-        // 'offers': [],
       },
     );
 

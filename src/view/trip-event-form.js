@@ -4,9 +4,9 @@ dayjs.extend(isSameOrAfter);
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import Smart from './smart';
-import { EVENT_FORM_MODE } from '../utils/const.js';
+import { EVENT_FORM_MODE, EVENT_TYPES } from '../utils/const.js';
 import he from 'he';
-import { EVENT_TYPES } from '../mock/event.js';
+
 
 const setOptions = (options, selectedType, offers) => {
   if (!offers) {
@@ -156,13 +156,10 @@ const createEventFormTemplate = (data, isNew, destinations, offers) => {
 };
 
 const DEFAULT_EVENT = {
-  // type: EVENT_TYPES[getRandomIntOfRange(0, EVENT_TYPES.length - 1)],
   type: 'drive',
   destination: {
     name: '',
     description: '',
-    // name: EVENT_DESTINATION_NAMES[getRandomIntOfRange(0, EVENT_DESTINATION_NAMES.length - 1)],
-    // description: DESTINATION_INFO_DESCRIPTIONS[getRandomIntOfRange(0, DESTINATION_INFO_DESCRIPTIONS.length - 1)],
     pictures: [],
   },
   basePrice: 0,
@@ -202,9 +199,6 @@ export default class TripEventForm extends Smart{
     this._setInnerHandlers();
     this._setDatepickerDateFrom();
     this._setDatepickerDateTo();
-
-    this._updateDataFromEvent = this._updateDataFromEvent.bind(this);
-
   }
 
   getTemplate() {
@@ -241,7 +235,6 @@ export default class TripEventForm extends Smart{
       event,
       {
         isHasOptions: event.options.length,
-        // isHasOptions: this._offers.find((offer) => offer.type === event.type).length,
         isHasPictures: event.destination.pictures.length,
       },
     );
@@ -256,31 +249,15 @@ export default class TripEventForm extends Smart{
     return data;
   }
 
-  // Этот метод создан для того, чтобы повторно вызывать проверку isHasOptions и isHasPictures
-  // Иначе результат проверки не обнолялся и элементы для опций не создавались
-  _updateDataFromEvent() {
-    this._tempData = TripEventForm.parseDataToEvent(this._data);
-    this._data = TripEventForm.parseEventToData(this._tempData);
-    this.updateData(this._data, false);
-    delete this._tempData;
-  }
-
   _eventTypeListClickHandler(evt) {
     evt.preventDefault();
 
     if (evt.target.tagName === 'LABEL') {
       const selectedType = evt.target.previousElementSibling.value;
-      // const newOptions = this._offers.find((offer) => offer.type === selectedType).offers;
-      // const newOptions = OPTION_TITLES[selectedType] !== undefined ? OPTION_TITLES[selectedType].options : [];
-      // Чтобы избежать повторной перерисовки страницы здесь мы обновляем только данные
       this.updateData({
         type: selectedType,
         options: [],
-        // options: newOptions,
-      // }, true);
       }, false);
-
-      // this._updateDataFromEvent();
     }
   }
 
@@ -318,18 +295,16 @@ export default class TripEventForm extends Smart{
     this.getElement().querySelector('#event-end-time-1').addEventListener('input', this._eventEndTimeInputHandler);
     this.getElement().querySelector('#event-start-time-1').addEventListener('input', this._eventStartTimeInputHandler);
 
-    // if (this._offers.find((offer) => offer.type === this._data.type)) {
-    // if (this._offers.find((offer) => offer.type === this._data.type)) {
     if (this.getElement().querySelector('.event__section--offers') !== null) {
       this.getElement().querySelector('.event__section--offers').addEventListener('change', this._offersClickHandler);
     }
   }
 
-  // Все нечисловые символы удаляются при сохранении
   _priceInputHandler(evt) {
     evt.preventDefault();
 
     if (this._checkPriceValidity()) {
+      // Все нечисловые символы удаляются при сохранении
       this.updateData({
         basePrice: Number(evt.target.value.replace(/[^\d]/g, '')),
       }, true);
@@ -391,7 +366,6 @@ export default class TripEventForm extends Smart{
       },
     );
 
-    //
     this._setDatepickerDateFrom();
   }
 
