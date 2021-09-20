@@ -10,7 +10,7 @@ import Api from './api/api.js';
 import TripInfoPresenter from './presenter/trip-info.js';
 
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip/';
-const AUTHORIZATION = 'Basic 8k69hjl853avfr5590';
+const AUTHORIZATION = 'Basic 8k69hjl853avfr5594';
 const api = new Api(END_POINT, AUTHORIZATION);
 
 const pageBodyContainerElement = document.querySelector('main .page-body__container');

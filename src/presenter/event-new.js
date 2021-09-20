@@ -37,7 +37,6 @@ export default class EventNew {
 
     remove(this._eventEditComponent);
     this._eventEditComponent = null;
-
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 

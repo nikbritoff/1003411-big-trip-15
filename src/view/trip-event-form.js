@@ -172,7 +172,7 @@ const DEFAULT_EVENT = {
 export default class TripEventForm extends Smart{
   constructor(event, destinations, offers) {
     super();
-
+    DEFAULT_EVENT.options = [];
     const eventData = event || DEFAULT_EVENT;
     this._offers = offers;
     this._destinations = destinations;
@@ -311,7 +311,7 @@ export default class TripEventForm extends Smart{
     }
   }
 
-  reset(event, justUpdating = false) {
+  reset(event, justUpdating) {
     this.updateData(
       TripEventForm.parseDataToEvent(event),
       justUpdating,
