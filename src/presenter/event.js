@@ -3,7 +3,7 @@ import TripEventFormView from '../view/trip-event-form.js';
 import { MODE } from '../utils/const.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
 import { USER_ACTION, UPDATE_TYPE } from '../utils/const.js';
-import { getUpdateType } from '../utils/event.js';
+// import { getUpdateType } from '../utils/event.js';
 
 export default class Event {
   constructor(eventsListElement, changeData, changeMode, destinations, offers) {
@@ -132,17 +132,10 @@ export default class Event {
 
   _handleFormSubmit(update) {
     // Здесь вызывается метод _handleViewAction
-    const isMajorUpdate =
-      this._event.dateFrom !== update.dateFrom ||
-      this._event.dateTo !== update.dateTo ||
-      this._event.basePrice !== update.basePrice ||
-      this._event.destination.name !== update.destination.name;
-
-    const isMinorUpdate = this._event.type !== update.type;
-
     this._changeData(
       USER_ACTION.UPDATE_EVENT,
-      getUpdateType(isMinorUpdate, isMajorUpdate),
+      // getUpdateType(isMinorUpdate, isMajorUpdate),
+      UPDATE_TYPE.MAJOR,
       update,
     );
     document.removeEventListener('keydown', this._escKeyDownHandler);

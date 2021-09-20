@@ -12,7 +12,12 @@ export default class TripInfo {
   }
 
   init() {
+    if (this._tripInfoComponent !== null) {
+      this._tripInfoComponent = null;
+    }
+    this._tripInfoComponent = new TripInfoView(this._eventsModel.getEvents());
     this._eventsModel.addObserver(this._handleModelEvent);
+    render(this._siteTripMainComponent, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
   }
 
   _handleModelEvent() {

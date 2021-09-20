@@ -9,9 +9,6 @@ import { sortDurationUp, sortPriceUp } from '../utils/event.js';
 import { filter } from '../utils/filter.js';
 import EventNewPresenter from './event-new.js';
 import LoadingView from '../view/loading.js';
-
-import { BACKEND_OFFERS, BACKEND_DESTINATIONS } from '../mock/event.js';
-
 import AddNewEventView from '../view/site-add-new-event.js';
 
 
@@ -29,7 +26,7 @@ export default class Trip {
 
     // this._backendOffers = backendOffers;
     this._backendDestinations = [];
-    // this._backendOffers = backendOffers;
+    this._backendOffers = [];
     // this._backendDestinations = backendDestinations;
 
     this._eventPresenter = new Map();
@@ -46,7 +43,8 @@ export default class Trip {
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
-    this._EventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._handleViewAction, BACKEND_DESTINATIONS);
+    // this._EventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._handleViewAction, this._backendDestinations);
+    this._EventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._handleViewAction, this._eventsModel);
 
     this.createEvent = this.createEvent.bind(this);
     this.isHidden = false;
@@ -55,7 +53,7 @@ export default class Trip {
   init() {
     this.isHidden = false;
     this._backendDestinations = this._eventsModel.getDestinations();
-    console.log(this._backendDestinations);
+    this._backendOffers = this._eventsModel.getOffers();
     this._renderSort();
     this._renderAddNewEvent();
     render(this._tripEventsComponent, this._eventsListComponent, RenderPosition.BEFOREEND);
@@ -63,6 +61,11 @@ export default class Trip {
     this._eventsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
 
+    // this._renderEvents();
+
+
+    this._isLoading = false;
+    remove(this._loadingComponent);
     this._renderEvents();
   }
 
@@ -104,7 +107,7 @@ export default class Trip {
 
   _renderEvent(event) {
     // const eventPresenter = new EventPresenter(this._eventsListComponent, this._handleViewAction, this._handleModeChange);
-    const eventPresenter = new EventPresenter(this._eventsListComponent, this._handleViewAction, this._handleModeChange, this._backendDestinations, BACKEND_OFFERS);
+    const eventPresenter = new EventPresenter(this._eventsListComponent, this._handleViewAction, this._handleModeChange, this._backendDestinations, this._backendOffers);
     eventPresenter.init(event);
     this._eventPresenter.set(event.id, eventPresenter);
   }
@@ -182,11 +185,17 @@ export default class Trip {
         }
         this._renderEvents();
         break;
-      case UPDATE_TYPE.INIT:
-        this._isLoading = false;
-        remove(this._loadingComponent);
-        this._renderEvents();
-        break;
+      // case UPDATE_TYPE.SET:
+      //   console.log('Update SET');
+      //   this._isLoading = false;
+      //   remove(this._loadingComponent);
+        // this._renderEvents();
+        // break;
+      // case UPDATE_TYPE.INIT:
+      //   this._isLoading = false;
+      //   remove(this._loadingComponent);
+      //   this._renderEvents();
+      //   break;
     }
   }
 

@@ -2,7 +2,7 @@ import TripPresenter from './presenter/trip.js';
 import EventsModel from './model/events.js';
 import FilterModel from './model/filter.js';
 import FilterPresenter from './presenter/filter.js';
-import { MENU_ITEM, UPDATE_TYPE } from './utils/const.js';
+import { MENU_ITEM } from './utils/const.js';
 import SiteMenuView from './view/site-menu.js';
 import { RenderPosition, render, remove } from './utils/render.js';
 import StatisticsView from './view/statistics.js';
@@ -58,22 +58,21 @@ const handleSiteMenuClick = (menuItem) => {
 };
 
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-
+const tripInfoPresenter = new TripInfoPresenter(siteTripMainElement, eventsModel);
 api.getData()
   .then((serverData) => {
     eventsModel.setDestinations(serverData.destinations);
-    eventsModel.setEvents(UPDATE_TYPE.INIT, serverData.events);
+    eventsModel.setOffers(serverData.offers);
+    eventsModel.setEvents(null, serverData.events);
     render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
   })
   .catch(() => {
-    eventsModel.setEvents(UPDATE_TYPE.INIT, []);
+    eventsModel.setEvents(null, []);
+    eventsModel.setDestinations([]);
+    eventsModel.setOffers([]);
     render(siteTripMainElement.querySelector('.trip-controls__navigation'), siteMenuComponent, RenderPosition.BEFOREEND);
   })
-  .then(tripPresenter.init());
-
-const tripInfoPresenter = new TripInfoPresenter(siteTripMainElement, eventsModel);
-tripInfoPresenter.init();
-// tripPresenter.init();
-
-
-// console.log(backendDestinations);
+  .then(() => {
+    tripPresenter.init();
+    tripInfoPresenter.init();
+  });

@@ -7,28 +7,20 @@ import AbstractView from './abstract';
 const createTripItemTemplate = (event) => {
   const {type, options, destination, basePrice, isFavorite, dateFrom, dateTo} = event;
   const destinationName = destination.name;
-
   const createTripItemOffersList = () => {
     let offers = '';
     if (options.length > 0) {
       options.forEach((option) => {
-        if (option.isChecked) {
-          offers +=
-        `<li class="event__offer">
-          <span class="event__offer-title">${option.title}</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">${option.price}</span>
-        </li>`;
-        }
+        offers +=
+      `<li class="event__offer">
+        <span class="event__offer-title">${option.title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${option.price}</span>
+      </li>`;
       });
     }
 
     return `<ul class="event__selected-offers">${offers}</ul>`;
-  };
-
-  const getFullEventPrice = () => {
-    const result = options.reduce((sum, current) => sum + current.price, 0) + basePrice;
-    return result;
   };
 
   const setEventFavoriteStatus = () => isFavorite ? 'event__favorite-btn--active' : '';
@@ -88,6 +80,7 @@ const createTripItemTemplate = (event) => {
 
 export default class TripEventItem extends AbstractView{
   constructor(data) {
+    // console.log(data);
     super();
     this._data = data;
     // Задается контекст объекта для обработчика событий

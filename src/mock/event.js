@@ -330,54 +330,6 @@ const OPTION_TITLES = {
   },
 };
 
-const generateEventType = () => {
-  const typeIndex = getRandomIntOfRange(0, EVENT_TYPES.length);
-  return EVENT_TYPES[typeIndex];
-};
-
-const generateEventDestinationName = () => {
-  const cityIndex = getRandomIntOfRange(0, EVENT_DESTINATION_NAMES.length);
-  return EVENT_DESTINATION_NAMES[cityIndex];
-};
-
-const generateEventOptions = (type) => {
-  const options = [];
-
-  if (OPTION_TITLES[type] !== undefined) {
-    const optionsAmount = getRandomIntOfRange(2, 6);
-    for (let i = 0; i < optionsAmount; i++) {
-      const currentOption = OPTION_TITLES[type].options[getRandomIntOfRange(0, OPTION_TITLES[type].options.length)];
-      options.push({
-        title: currentOption.title,
-        price: currentOption.price,
-        isChecked: currentOption.isChecked,
-      });
-    }
-  }
-
-  return options;
-};
-
-const generateEventDestinationDescription = () => {
-  const sentenciesAmout = getRandomIntOfRange(1, 6);
-  let description = '';
-
-  for (let i = 0; i < sentenciesAmout; i++) {
-    description = `${description} ${DESTINATION_INFO_DESCRIPTIONS[getRandomIntOfRange(0, DESTINATION_INFO_DESCRIPTIONS.length)]}`;
-  }
-
-  return description;
-};
-
-const generateEventDestinationPitures = () => {
-  const picturesAmount = getRandomIntOfRange(0, 10);
-  const pictures = new Array(picturesAmount).fill('').map(() => ({
-    src: `http://picsum.photos/248/152?r=${getRandomIntOfRange(1, 25)}`,
-    description: PICTURE_DESCRIPTIONS[getRandomIntOfRange(0, PICTURE_DESCRIPTIONS.length)],
-  }));
-  return pictures;
-};
-
 const generateDateFrom = () => {
   const now = dayjs();
   const eventDate = now.add(getRandomIntOfRange(3, 3000), 'hour').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');

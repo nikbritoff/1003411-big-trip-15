@@ -6,10 +6,13 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import Smart from './smart';
 import { EVENT_FORM_MODE } from '../utils/const.js';
 import he from 'he';
-import { EVENT_DESTINATION_NAMES, EVENT_TYPES, DESTINATION_INFO_DESCRIPTIONS, OPTION_TITLES } from '../mock/event.js';
-import { getRandomIntOfRange } from '../mock/utils.js';
+import { EVENT_TYPES } from '../mock/event.js';
 
 const setOptions = (options, selectedType, offers) => {
+  if (!offers) {
+    return '';
+  }
+
   const targetOffer = offers.find((offer) => offer.type === selectedType);
 
   if (!offers || !targetOffer) {
@@ -42,7 +45,6 @@ const setOptions = (options, selectedType, offers) => {
 };
 
 const setDestinationList = (destinations) => {
-  console.log(destinations);
   let datalistOptions = '';
   destinations.forEach((destination) => {
     datalistOptions += `<option value="${destination.name}"></option>`;
@@ -103,8 +105,8 @@ const setEventDescription = (destination, isHasPictures) => {
 };
 
 const createEventFormTemplate = (data, isNew, destinations, offers) => {
-  const {type, destination, options, basePrice, dateFrom, dateTo, isHasOptions, isHasPictures} = data;
-
+  const {type, destination, options, basePrice, dateFrom, dateTo } = data;
+  const targetOffer = offers.find((offer) => offer.type === type).offers;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -146,18 +148,21 @@ const createEventFormTemplate = (data, isNew, destinations, offers) => {
       ${isNew ? '' : '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>'}
     </header>
     <section class="event__details">
-      ${isHasOptions ?  setOptions(options, type, offers) : ''}
-      ${setEventDescription(destination, isHasPictures)}
+      ${targetOffer.length > 0 ?  setOptions(options, type, offers) : ''}
+      ${setEventDescription(destination, destination.pictures)}
     </section>
   </form>
 </li>`;
 };
 
 const DEFAULT_EVENT = {
-  type: EVENT_TYPES[getRandomIntOfRange(0, EVENT_TYPES.length - 1)],
+  // type: EVENT_TYPES[getRandomIntOfRange(0, EVENT_TYPES.length - 1)],
+  type: 'drive',
   destination: {
-    name: EVENT_DESTINATION_NAMES[getRandomIntOfRange(0, EVENT_DESTINATION_NAMES.length - 1)],
-    description: DESTINATION_INFO_DESCRIPTIONS[getRandomIntOfRange(0, DESTINATION_INFO_DESCRIPTIONS.length - 1)],
+    name: '',
+    description: '',
+    // name: EVENT_DESTINATION_NAMES[getRandomIntOfRange(0, EVENT_DESTINATION_NAMES.length - 1)],
+    // description: DESTINATION_INFO_DESCRIPTIONS[getRandomIntOfRange(0, DESTINATION_INFO_DESCRIPTIONS.length - 1)],
     pictures: [],
   },
   basePrice: 0,
@@ -192,12 +197,14 @@ export default class TripEventForm extends Smart{
 
     this._eventEndTimeInputHandler = this._eventEndTimeInputHandler.bind(this);
     this._eventStartTimeInputHandler = this._eventStartTimeInputHandler.bind(this);
+    this._offersClickHandler = this._offersClickHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepickerDateFrom();
     this._setDatepickerDateTo();
 
     this._updateDataFromEvent = this._updateDataFromEvent.bind(this);
+
   }
 
   getTemplate() {
@@ -206,7 +213,9 @@ export default class TripEventForm extends Smart{
 
   _editSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.editSubmit(TripEventForm.parseDataToEvent(this._data));
+    if (this._checkPriceValidity() && this._checkDestinationValidity()) {
+      this._callback.editSubmit(TripEventForm.parseDataToEvent(this._data));
+    }
   }
 
   setSubmitHandler(callback) {
@@ -232,6 +241,7 @@ export default class TripEventForm extends Smart{
       event,
       {
         isHasOptions: event.options.length,
+        // isHasOptions: this._offers.find((offer) => offer.type === event.type).length,
         isHasPictures: event.destination.pictures.length,
       },
     );
@@ -260,28 +270,26 @@ export default class TripEventForm extends Smart{
 
     if (evt.target.tagName === 'LABEL') {
       const selectedType = evt.target.previousElementSibling.value;
-      const newOptions = OPTION_TITLES[selectedType] !== undefined ? OPTION_TITLES[selectedType].options : [];
+      // const newOptions = this._offers.find((offer) => offer.type === selectedType).offers;
+      // const newOptions = OPTION_TITLES[selectedType] !== undefined ? OPTION_TITLES[selectedType].options : [];
       // Чтобы избежать повторной перерисовки страницы здесь мы обновляем только данные
       this.updateData({
         type: selectedType,
-        options: newOptions,
-      }, true);
-      // }, false);
+        options: [],
+        // options: newOptions,
+      // }, true);
+      }, false);
 
-      this._updateDataFromEvent();
+      // this._updateDataFromEvent();
     }
   }
 
   _destinationChangeHandler(evt) {
     evt.preventDefault();
     const selectedDestinationName = evt.target.value;
-    // Проверка на наличие города в списке назначений
-    const destinationInputElement = this.getElement().querySelector('.event__input--destination');
-    const isInDestinations = this._destinations.some((destination) => destination.name === selectedDestinationName);
-    destinationInputElement.setCustomValidity('');
-    if (isInDestinations) {
+
+    if (this._checkDestinationValidity()) {
       const destinationInfo = this._destinations.find((destination) => destination.name === selectedDestinationName);
-      console.log('sl: ', destinationInfo);
       const description = destinationInfo.description;
       const pictures = destinationInfo.pictures;
       this.updateData({
@@ -290,12 +298,8 @@ export default class TripEventForm extends Smart{
           description: description,
           pictures: pictures,
         },
-      }, true);
-      this._updateDataFromEvent();
-    } else {
-      destinationInputElement.setCustomValidity('Пункт назначения не сооотвествует ни одному из указанным в списке');
+      }, false);
     }
-    destinationInputElement.reportValidity();
   }
 
   restoreHandlers() {
@@ -313,21 +317,23 @@ export default class TripEventForm extends Smart{
 
     this.getElement().querySelector('#event-end-time-1').addEventListener('input', this._eventEndTimeInputHandler);
     this.getElement().querySelector('#event-start-time-1').addEventListener('input', this._eventStartTimeInputHandler);
+
+    // if (this._offers.find((offer) => offer.type === this._data.type)) {
+    // if (this._offers.find((offer) => offer.type === this._data.type)) {
+    if (this.getElement().querySelector('.event__section--offers') !== null) {
+      this.getElement().querySelector('.event__section--offers').addEventListener('change', this._offersClickHandler);
+    }
   }
 
   // Все нечисловые символы удаляются при сохранении
   _priceInputHandler(evt) {
     evt.preventDefault();
-    const priceInputElement = this.getElement().querySelector('.event__input--price');
-    if (priceInputElement.value > 0) {
-      priceInputElement.setCustomValidity('');
-    } else {
-      priceInputElement.setCustomValidity('Стоимость должна быть целым положительным числом.');
+
+    if (this._checkPriceValidity()) {
+      this.updateData({
+        basePrice: Number(evt.target.value.replace(/[^\d]/g, '')),
+      }, true);
     }
-    priceInputElement.reportValidity();
-    this.updateData({
-      basePrice: Number(evt.target.value.replace(/[^\d]/g, '')),
-    }, true);
   }
 
   reset(event, justUpdating = false) {
@@ -418,5 +424,53 @@ export default class TripEventForm extends Smart{
   setDeleteClickHandler(callback) {
     this._callback.deleteClick = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
+  }
+
+  _checkPriceValidity() {
+    const priceInputElement = this.getElement().querySelector('.event__input--price');
+    priceInputElement.setCustomValidity('');
+    if (priceInputElement.value > 0) {
+      priceInputElement.setCustomValidity('');
+      priceInputElement.reportValidity();
+      return true;
+    } else {
+      priceInputElement.setCustomValidity('Стоимость должна быть целым положительным числом.');
+      priceInputElement.reportValidity();
+      return false;
+    }
+  }
+
+  _checkDestinationValidity() {
+    // Проверка на наличие города в списке назначений
+    const destinationInputElement = this.getElement().querySelector('.event__input--destination');
+    const selectedDestinationName = destinationInputElement.value;
+    const isInDestinations = this._destinations.some((destination) => destination.name === selectedDestinationName);
+    destinationInputElement.setCustomValidity('');
+    if (isInDestinations) {
+      destinationInputElement.setCustomValidity('');
+      destinationInputElement.reportValidity();
+      return true;
+    } else {
+      destinationInputElement.setCustomValidity('Пункт назначения не сооотвествует ни одному из указанным в списке');
+      destinationInputElement.reportValidity();
+      return false;
+    }
+  }
+
+  _offersClickHandler(evt) {
+    const targetOffer = this._offers.find((offer) => offer.type === this._data.type);
+    const offerTitle = evt.target.nextElementSibling.querySelector('.event__offer-title').textContent;
+    const selectedOffer = targetOffer.offers.find((offer) => offer.title === offerTitle);
+
+    if (evt.target.checked) {
+      this._data.options.push(selectedOffer);
+    } else {
+      const selectedOfferIndex = this._data.options.findIndex((option) => option.title === selectedOffer.title);
+
+      this._data.options = [
+        ...this._data.options.slice(0, selectedOfferIndex),
+        ...this._data.options.slice(selectedOfferIndex + 1),
+      ];
+    }
   }
 }
