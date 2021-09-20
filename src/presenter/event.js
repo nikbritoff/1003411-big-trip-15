@@ -109,8 +109,8 @@ export default class Event {
         });
         break;
       case FORM_STATE.ABORTING:
-        this._eventItemComponent.shake(resetFormState);
         this._eventFormComponent.shake(resetFormState);
+        this._eventItemComponent.shake(resetFormState);
 
     }
   }

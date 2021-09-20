@@ -29,10 +29,13 @@ export default class Abstract {
   }
 
   shake(callback) {
-    this.getElement().style.border = '2px solid purple';
-    this.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    const element = this.getElement();
+
+    element.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    element.style.outline = '2px solid tomato';
     setTimeout(() => {
       this.getElement().style.animation = '';
+      element.style.animation = '';
       callback();
     }, SHAKE_ANIMATION_TIMEOUT);
   }
