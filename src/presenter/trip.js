@@ -4,7 +4,7 @@ import TripInfoView from '../view/trip-info';
 import SiteSortingView from '../view/site-sorting';
 import NoEventView from '../view/no-events';
 import EventPresenter from './event.js';
-import { SORT_TYPE, UPDATE_TYPE, USER_ACTION, FILTER_TYPE } from '../utils/const.js';
+import { SORT_TYPE, UPDATE_TYPE, USER_ACTION, FILTER_TYPE } from '../const/const.js';
 import { sortDurationUp, sortPriceUp } from '../utils/event.js';
 import { filter } from '../utils/filter.js';
 import EventNewPresenter from './event-new.js';

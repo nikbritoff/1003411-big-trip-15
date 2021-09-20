@@ -1,4 +1,4 @@
-import { FILTER_TYPE } from '../utils/const';
+import { FILTER_TYPE } from '../const/const';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 dayjs.extend(isSameOrAfter);

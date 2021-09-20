@@ -1,8 +1,8 @@
 import TripEventItemView from '../view/trip-event-item.js';
 import TripEventFormView from '../view/trip-event-form.js';
-import { MODE } from '../utils/const.js';
+// import { MODE } from '../const/const.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
-import { USER_ACTION, UPDATE_TYPE } from '../utils/const.js';
+import { USER_ACTION, UPDATE_TYPE, MODE } from '../const/const.js';
 
 export default class Event {
   constructor(eventsListElement, changeData, changeMode, destinations, offers) {

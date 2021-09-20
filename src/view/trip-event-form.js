@@ -4,7 +4,7 @@ dayjs.extend(isSameOrAfter);
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import Smart from './smart';
-import { EVENT_FORM_MODE, EVENT_TYPES } from '../utils/const.js';
+import { EVENT_FORM_MODE, EVENT_TYPES } from '../const/const.js';
 import he from 'he';
 
 
