@@ -1,7 +1,7 @@
 import TripEventFormView from '../view/trip-event-form.js';
 import { remove, render, RenderPosition } from '../utils/render.js';
 // import { USER_ACTION, UPDATE_TYPE } from '../const/const.js';
-import { EVENT_FORM_MODE, USER_ACTION, UPDATE_TYPE } from '../const/const.js';
+import { EVENT_FORM_MODE, USER_ACTION, UPDATE_TYPE, FORM_STATE } from '../const/const.js';
 
 export default class EventNew {
   constructor(eventsListElement, changeData, eventsModel) {
@@ -40,6 +40,43 @@ export default class EventNew {
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
+  setSaving() {
+    this._eventEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setViewState(state) {
+    switch (state) {
+      case FORM_STATE.SAVING:
+        this._eventEditComponent.updateData({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case FORM_STATE.DELETING:
+        this._eventEditComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+    }
+  }
+
+  setAborting() {
+    console.log('set Aborting');
+    const resetFormState = () => {
+      this._eventEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._eventEditComponent.shake(resetFormState);
+  }
+
   _handleFormSubmit(event) {
     // handle view action
     this._changeData(
@@ -48,7 +85,7 @@ export default class EventNew {
       event,
     );
     this._eventFormMode = EVENT_FORM_MODE.edit;
-    this.destroy();
+    // this.destroy();
   }
 
   _handleCancelClick() {

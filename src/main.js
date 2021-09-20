@@ -6,11 +6,12 @@ import { MENU_ITEM } from './const/const.js';
 import SiteMenuView from './view/site-menu.js';
 import { RenderPosition, render, remove } from './utils/render.js';
 import StatisticsView from './view/statistics.js';
+import AddNewEventView from './view/site-add-new-event.js';
 import Api from './api/api.js';
 import TripInfoPresenter from './presenter/trip-info.js';
 
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip/';
-const AUTHORIZATION = 'Basic 8k69hjl853avfr5594';
+const AUTHORIZATION = 'Basic 8k69hjl853avfr5593';
 const api = new Api(END_POINT, AUTHORIZATION);
 
 const pageBodyContainerElement = document.querySelector('main .page-body__container');
@@ -18,20 +19,29 @@ const siteTripMainElement = document.querySelector('.trip-main');
 const siteTripEvents = document.querySelector('.trip-events');
 // Model
 const eventsModel = new EventsModel();
-
 const filterModel = new FilterModel();
+
 // Отрисовка хэдера
-
-const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEvents, eventsModel, filterModel, api);
-
 const filterPresenter = new FilterPresenter(
   siteTripMainElement.querySelector('.trip-controls__filters'),
   filterModel);
+
 filterPresenter.init();
 
 let statiscticsComponent = null;
+const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEvents, eventsModel, filterModel, api, statiscticsComponent);
 
 const siteMenuComponent = new SiteMenuView();
+
+const handleAddNewEventButtonClick = () => {
+  siteMenuComponent.setActiveMenuItem(MENU_ITEM.EVENTS);
+  tripPresenter.createEvent();
+  remove(statiscticsComponent);
+};
+
+const addNewEventButtonComponent = new AddNewEventView();
+render(siteTripMainElement, addNewEventButtonComponent, RenderPosition.BEFOREEND);
+addNewEventButtonComponent.setAddNewButtonClickHabdler(handleAddNewEventButtonClick);
 
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
@@ -58,6 +68,7 @@ const handleSiteMenuClick = (menuItem) => {
 
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 const tripInfoPresenter = new TripInfoPresenter(siteTripMainElement, eventsModel);
+
 api.getData()
   .then((serverData) => {
     eventsModel.setDestinations(serverData.destinations);

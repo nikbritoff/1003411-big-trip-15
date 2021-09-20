@@ -4,11 +4,27 @@ dayjs.extend(isSameOrAfter);
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import Smart from './smart';
-import { EVENT_FORM_MODE, EVENT_TYPES } from '../const/const.js';
+import { EVENT_TYPES } from '../const/const.js';
 import he from 'he';
 
+const setResetFormButtonText = (isNew, isDeleting) => {
+  if (isNew && isDeleting) {
+    return 'Canceling...';
+  }
 
-const setOptions = (options, selectedType, offers) => {
+  if (!isNew && isDeleting) {
+    return 'Deleting...';
+  }
+
+  if (isNew && !isDeleting) {
+    return 'Cancel';
+  }
+
+  return 'Delete';
+};
+
+
+const setOptions = (options, selectedType, offers, isDisabled) => {
   if (!offers) {
     return '';
   }
@@ -24,7 +40,7 @@ const setOptions = (options, selectedType, offers) => {
     const isChecked = options.some((option) => option.title === currentOption.title);
     avialableOptions += `
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-${index}" type="checkbox" name="event-offer-comfort" ${isChecked ? 'checked' : ''}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-${index}" type="checkbox" name="event-offer-comfort" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
       <label class="event__offer-label" for="event-offer-comfort-${index}">
         <span class="event__offer-title">${currentOption.title}</span>
         &plus;&euro;&nbsp;
@@ -105,7 +121,7 @@ const setEventDescription = (destination, isHasPictures) => {
 };
 
 const createEventFormTemplate = (data, isNew, destinations, offers) => {
-  const {type, destination, options, basePrice, dateFrom, dateTo } = data;
+  const {type, destination, options, basePrice, dateFrom, dateTo, isDisabled, isSaving, isDeleting} = data;
   const targetOffer = offers.find((offer) => offer.type === type).offers;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
@@ -115,7 +131,7 @@ const createEventFormTemplate = (data, isNew, destinations, offers) => {
           <span class="visually-hidden">Choose event type</span>
           <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
         </label>
-        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
         ${createFormEventTypeTemplate(EVENT_TYPES, type)}
       </div>
 
@@ -123,16 +139,16 @@ const createEventFormTemplate = (data, isNew, destinations, offers) => {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
         ${setDestinationList(destinations)}
       </div>
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${he.encode(dayjs(dateFrom).format('DD/MM/YY HH:mm'))}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${he.encode(dayjs(dateFrom).format('DD/MM/YY HH:mm'))}" ${isDisabled ? 'disabled' : ''}>
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${he.encode(dayjs(dateTo).format('DD/MM/YY HH:mm'))}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${he.encode(dayjs(dateTo).format('DD/MM/YY HH:mm'))}" ${isDisabled ? 'disabled' : ''}>
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -140,15 +156,17 @@ const createEventFormTemplate = (data, isNew, destinations, offers) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(String(basePrice))}">
+        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(String(basePrice))}" ${isDisabled ? 'disabled' : ''}>
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">${isNew ? EVENT_FORM_MODE.add : EVENT_FORM_MODE.edit}</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit">
+        ${isSaving ? 'Saving...' : 'Save'}
+      </button>
+      <button class="event__reset-btn" type="reset">${setResetFormButtonText(isNew, isDeleting)}</button>
       ${isNew ? '' : '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>'}
     </header>
     <section class="event__details">
-      ${targetOffer.length > 0 ?  setOptions(options, type, offers) : ''}
+      ${targetOffer.length > 0 ?  setOptions(options, type, offers, isDisabled) : ''}
       ${setEventDescription(destination, destination.pictures)}
     </section>
   </form>
@@ -236,6 +254,9 @@ export default class TripEventForm extends Smart{
       {
         isHasOptions: event.options.length,
         isHasPictures: event.destination.pictures.length,
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
       },
     );
   }
@@ -245,6 +266,9 @@ export default class TripEventForm extends Smart{
 
     delete data.isHasOptions;
     delete data.isHasPictures;
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
 
     return data;
   }

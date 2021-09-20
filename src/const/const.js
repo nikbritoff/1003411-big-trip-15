@@ -43,4 +43,10 @@ const MENU_ITEM = {
 const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 const TRANSPORT_TYPES = ['Taxi', 'Bus', 'Train', 'Ship', 'Transport', 'Drive', 'Flight'];
 
-export {SORT_TYPE, MODE, EVENT_FORM_MODE, USER_ACTION, UPDATE_TYPE, FILTER_TYPE, MENU_ITEM, EVENT_TYPES, TRANSPORT_TYPES};
+const FORM_STATE = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
+};
+
+export {SORT_TYPE, MODE, EVENT_FORM_MODE, USER_ACTION, UPDATE_TYPE, FILTER_TYPE, MENU_ITEM, EVENT_TYPES, TRANSPORT_TYPES, FORM_STATE};
