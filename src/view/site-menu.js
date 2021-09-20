@@ -1,5 +1,4 @@
 import AbstractView from './abstract.js';
-// import { MENU_ITEM } from '../const/const.js';
 import { MENU_ITEM } from '../const/const.js';
 
 const createSiteMenuTemplate = () => (

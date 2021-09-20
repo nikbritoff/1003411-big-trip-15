@@ -1,6 +1,5 @@
 import TripEventItemView from '../view/trip-event-item.js';
 import TripEventFormView from '../view/trip-event-form.js';
-// import { MODE } from '../const/const.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
 import { USER_ACTION, UPDATE_TYPE, MODE, FORM_STATE } from '../const/const.js';
 
@@ -110,7 +109,6 @@ export default class Event {
         });
         break;
       case FORM_STATE.ABORTING:
-        console.log('form state');
         this._eventItemComponent.shake(resetFormState);
         this._eventFormComponent.shake(resetFormState);
 
@@ -177,7 +175,6 @@ export default class Event {
       update,
     );
     document.removeEventListener('keydown', this._escKeyDownHandler);
-    // this._replaceFormToItem();
   }
 
   _deleteClickHandler(event) {

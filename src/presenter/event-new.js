@@ -1,6 +1,5 @@
 import TripEventFormView from '../view/trip-event-form.js';
 import { remove, render, RenderPosition } from '../utils/render.js';
-// import { USER_ACTION, UPDATE_TYPE } from '../const/const.js';
 import { EVENT_FORM_MODE, USER_ACTION, UPDATE_TYPE, FORM_STATE } from '../const/const.js';
 
 export default class EventNew {
@@ -65,7 +64,6 @@ export default class EventNew {
   }
 
   setAborting() {
-    console.log('set Aborting');
     const resetFormState = () => {
       this._eventEditComponent.updateData({
         isDisabled: false,
@@ -85,7 +83,6 @@ export default class EventNew {
       event,
     );
     this._eventFormMode = EVENT_FORM_MODE.edit;
-    // this.destroy();
   }
 
   _handleCancelClick() {

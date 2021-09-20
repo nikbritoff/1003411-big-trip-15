@@ -9,7 +9,6 @@ import { sortDurationUp, sortPriceUp } from '../utils/event.js';
 import { filter } from '../utils/filter.js';
 import EventNewPresenter from './event-new.js';
 import LoadingView from '../view/loading.js';
-// import AddNewEventView from '../view/site-add-new-event.js';
 
 
 export default class Trip {
@@ -22,7 +21,6 @@ export default class Trip {
     this._tripInfoComponent = null;
     this._tripSortingComponent = null;
     this._eventsListComponent = new SiteEventsListView();
-    // this._addNewEventButtonComponent = new AddNewEventView();
     this._backendDestinations = [];
     this._backendOffers = [];
     this._eventPresenter = new Map();
@@ -49,7 +47,6 @@ export default class Trip {
     this._backendDestinations = this._eventsModel.getDestinations();
     this._backendOffers = this._eventsModel.getOffers();
     this._renderSort();
-    // this._renderAddNewEvent();
     render(this._tripEventsComponent, this._eventsListComponent, RenderPosition.BEFOREEND);
 
     this._eventsModel.addObserver(this._handleModelEvent);
@@ -91,11 +88,6 @@ export default class Trip {
 
     render(this._tripEventsComponent, this._tripSortingComponent, RenderPosition.AFTERBEGIN);
   }
-
-  // _renderAddNewEvent() {
-  //   render(this._siteTripMainComponent, this._addNewEventButtonComponent, RenderPosition.BEFOREEND);
-  //   this._addNewEventButtonComponent.setAddNewButtonClickHabdler(this.createEvent);
-  // }
 
   _renderEvent(event) {
     const eventPresenter = new EventPresenter(this._eventsListComponent, this._handleViewAction, this._handleModeChange, this._backendDestinations, this._backendOffers);
@@ -140,12 +132,8 @@ export default class Trip {
             this._eventsModel.updateEvent(updateType, response);
           })
           .catch(() => {
-            console.log('catch');
             this._eventPresenter.get(update.id).setViewState(FORM_STATE.ABORTING);
           });
-        // this._api.updateEvent(update).then((response) => {
-        //   this._eventsModel.updateEvent(updateType, response);
-        // });
 
         break;
       case USER_ACTION.ADD_EVENT:
@@ -157,9 +145,6 @@ export default class Trip {
           .catch(() => {
             this._EventNewPresenter.setAborting();
           });
-        // this._api.addEvent(update).then((response) => {
-        //   this._eventsModel.addEvent(updateType, response);
-        // });
         break;
       case USER_ACTION.DELETE_EVENT:
         this._eventPresenter.get(update.id).setViewState(FORM_STATE.DELETING);
