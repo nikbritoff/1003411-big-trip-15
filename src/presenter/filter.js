@@ -1,6 +1,6 @@
 import SiteFilterWiew from '../view/site-filter.js';
 import { render, RenderPosition, replace, remove } from '../utils/render.js';
-import { FILTER_TYPE, UPDATE_TYPE } from '../utils/const.js';
+import { FILTER_TYPE, UPDATE_TYPE } from '../const/const.js';
 
 export default class Filter {
   constructor(filterContainer, filterModel) {

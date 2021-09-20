@@ -1,18 +1,20 @@
 import TripEventItemView from '../view/trip-event-item.js';
 import TripEventFormView from '../view/trip-event-form.js';
-import { MODE } from '../utils/const.js';
+// import { MODE } from '../const/const.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
-import { USER_ACTION, UPDATE_TYPE } from '../utils/const.js';
-import { getUpdateType } from '../utils/event.js';
+import { USER_ACTION, UPDATE_TYPE, MODE } from '../const/const.js';
 
 export default class Event {
-  constructor(eventsListElement, changeData, changeMode) {
+  constructor(eventsListElement, changeData, changeMode, destinations, offers) {
     this._eventsListComponent = eventsListElement;
     this._changeData = changeData;
     this._changeMode = changeMode;
 
     this._eventItemComponent = null;
     this._eventFormComponent = null;
+
+    this._offers = offers;
+    this._destinations = destinations;
 
     this._mode = MODE.DEFAULT;
 
@@ -32,7 +34,7 @@ export default class Event {
     const prevFormComponent = this._eventFormComponent;
 
     this._eventItemComponent = new TripEventItemView(this._event);
-    this._eventFormComponent = new TripEventFormView(this._event);
+    this._eventFormComponent = new TripEventFormView(this._event, this._destinations, this._offers);
 
     this._eventItemComponent.setEditClickHandler(this._handleEditClick);
     this._eventFormComponent.setSubmitHandler(this._handleFormSubmit);
@@ -127,17 +129,9 @@ export default class Event {
 
   _handleFormSubmit(update) {
     // Здесь вызывается метод _handleViewAction
-    const isMajorUpdate =
-      this._event.dateFrom !== update.dateFrom ||
-      this._event.dateTo !== update.dateTo ||
-      this._event.basePrice !== update.basePrice ||
-      this._event.destination.name !== update.destination.name;
-
-    const isMinorUpdate = this._event.type !== update.type;
-
     this._changeData(
       USER_ACTION.UPDATE_EVENT,
-      getUpdateType(isMinorUpdate, isMajorUpdate),
+      UPDATE_TYPE.MAJOR,
       update,
     );
     document.removeEventListener('keydown', this._escKeyDownHandler);

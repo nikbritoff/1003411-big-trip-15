@@ -13,11 +13,15 @@ const updateArrayElement = (array, update) => {
 };
 
 const convertTimeFromMiliseconds = (miliseconds) => {
-  const calculateDays = Math.floor(miliseconds / (1000 * 60 * 60 * 24) % 30);
-  let lostTime = miliseconds - (calculateDays * (1000 * 60 * 60 * 24));
-  const calculateHours = Math.floor((lostTime / (1000 * 60 * 60)) % 24);
-  lostTime = miliseconds -  (calculateHours * (1000 * 60 * 60));
-  const calculateMinutes = Math.floor((lostTime / (1000 * 60)) % 60);
+  const minuteFromMiliseconds = 1000 * 60;
+  const hourFromMinutes = minuteFromMiliseconds * 60;
+  const dayFromHours = hourFromMinutes * 24;
+
+  const calculateDays = Math.floor(miliseconds / dayFromHours % 30);
+  let lostTime = miliseconds - (calculateDays * dayFromHours);
+  const calculateHours = Math.floor((lostTime / hourFromMinutes) % 24);
+  lostTime = miliseconds -  (calculateHours * hourFromMinutes);
+  const calculateMinutes = Math.floor((lostTime / minuteFromMiliseconds) % 60);
 
   const days = calculateDays > 0 ? `${String(calculateDays).padStart(2, '0')}D ` : '';
   const spentTime = `${days}${String(calculateHours).padStart(2, '0')}H ${String(calculateMinutes).padStart(2, '0')}M`;

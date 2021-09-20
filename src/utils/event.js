@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { UPDATE_TYPE } from './const';
+import { UPDATE_TYPE } from '../const/const';
 
 const sortDurationUp = (eventA, eventB) => {
   const durationOfEventA = dayjs(eventA.dateTo).diff(eventA.dateFrom, 'minute');
