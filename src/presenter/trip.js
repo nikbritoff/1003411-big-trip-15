@@ -36,7 +36,7 @@ export default class Trip {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
-    this._EventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._handleViewAction, this._eventsModel);
+    this._eventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._handleViewAction, this._eventsModel);
 
     this.createEvent = this.createEvent.bind(this);
     this.isHidden = false;
@@ -115,7 +115,7 @@ export default class Trip {
   }
 
   _handleModeChange() {
-    this._EventNewPresenter.destroy();
+    this._eventNewPresenter.destroy();
     this._eventPresenter.forEach((presenter) => presenter.resetView());
   }
 
@@ -137,13 +137,13 @@ export default class Trip {
 
         break;
       case USER_ACTION.ADD_EVENT:
-        this._EventNewPresenter.setViewState(FORM_STATE.SAVING);
+        this._eventNewPresenter.setViewState(FORM_STATE.SAVING);
         this._api.addEvent(update)
           .then((response) => {
             this._eventsModel.addEvent(updateType, response);
           })
           .catch(() => {
-            this._EventNewPresenter.setAborting();
+            this._eventNewPresenter.setAborting();
           });
         break;
       case USER_ACTION.DELETE_EVENT:
@@ -217,7 +217,7 @@ export default class Trip {
   }
 
   _clearAllEvents({resetSortType = false} = {}) {
-    this._EventNewPresenter.destroy();
+    this._eventNewPresenter.destroy();
     this._eventPresenter.forEach((presenter) => presenter.destroy());
     this._eventPresenter.clear();
 
@@ -239,7 +239,7 @@ export default class Trip {
 
     this._currentSortType = SORT_TYPE.DEFAULT;
     this._filterModel.setFilter(UPDATE_TYPE.MAJOR, FILTER_TYPE.EVERYTHING);
-    this._EventNewPresenter.init();
+    this._eventNewPresenter.init();
   }
 
   _renderLoading() {
