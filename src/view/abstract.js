@@ -1,5 +1,7 @@
 import { createElement } from '../utils/render';
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 export default class Abstract {
   constructor() {
     if (new.target === Abstract) {
@@ -24,5 +26,17 @@ export default class Abstract {
 
   removeElement() {
     this._element = null;
+  }
+
+  shake(callback) {
+    const element = this.getElement();
+
+    element.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    element.style.outline = '2px solid tomato';
+    setTimeout(() => {
+      this.getElement().style.animation = '';
+      element.style.animation = '';
+      callback();
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 }

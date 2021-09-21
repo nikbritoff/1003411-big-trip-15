@@ -4,12 +4,11 @@ import TripInfoView from '../view/trip-info';
 import SiteSortingView from '../view/site-sorting';
 import NoEventView from '../view/no-events';
 import EventPresenter from './event.js';
-import { SORT_TYPE, UPDATE_TYPE, USER_ACTION, FILTER_TYPE } from '../const/const.js';
+import { SORT_TYPE, UPDATE_TYPE, USER_ACTION, FILTER_TYPE, FORM_STATE } from '../const/const.js';
 import { sortDurationUp, sortPriceUp } from '../utils/event.js';
 import { filter } from '../utils/filter.js';
 import EventNewPresenter from './event-new.js';
 import LoadingView from '../view/loading.js';
-import AddNewEventView from '../view/site-add-new-event.js';
 
 
 export default class Trip {
@@ -22,7 +21,6 @@ export default class Trip {
     this._tripInfoComponent = null;
     this._tripSortingComponent = null;
     this._eventsListComponent = new SiteEventsListView();
-    this._addNewEventButtonComponent = new AddNewEventView();
     this._backendDestinations = [];
     this._backendOffers = [];
     this._eventPresenter = new Map();
@@ -49,7 +47,6 @@ export default class Trip {
     this._backendDestinations = this._eventsModel.getDestinations();
     this._backendOffers = this._eventsModel.getOffers();
     this._renderSort();
-    this._renderAddNewEvent();
     render(this._tripEventsComponent, this._eventsListComponent, RenderPosition.BEFOREEND);
 
     this._eventsModel.addObserver(this._handleModelEvent);
@@ -64,6 +61,7 @@ export default class Trip {
     this._clearAllEvents(({resetSortType: true}));
 
     remove(this._eventsListComponent);
+    remove(this._noEventsComponent);
 
     this._eventsModel.removeObserver(this._handleModelEvent);
     this._filterModel.removeObserver(this._handleModelEvent);
@@ -89,11 +87,6 @@ export default class Trip {
     this._tripSortingComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
 
     render(this._tripEventsComponent, this._tripSortingComponent, RenderPosition.AFTERBEGIN);
-  }
-
-  _renderAddNewEvent() {
-    render(this._siteTripMainComponent, this._addNewEventButtonComponent, RenderPosition.BEFOREEND);
-    this._addNewEventButtonComponent.setAddNewButtonClickHabdler(this.createEvent);
   }
 
   _renderEvent(event) {
@@ -133,19 +126,35 @@ export default class Trip {
     // update - обновленные данные
     switch (actionType) {
       case USER_ACTION.UPDATE_EVENT:
-        this._api.updateEvent(update).then((response) => {
-          this._eventsModel.updateEvent(updateType, response);
-        });
+        this._eventPresenter.get(update.id).setViewState(FORM_STATE.SAVING);
+        this._api.updateEvent(update)
+          .then((response) => {
+            this._eventsModel.updateEvent(updateType, response);
+          })
+          .catch(() => {
+            this._eventPresenter.get(update.id).setViewState(FORM_STATE.ABORTING);
+          });
+
         break;
       case USER_ACTION.ADD_EVENT:
-        this._api.addEvent(update).then((response) => {
-          this._eventsModel.addEvent(updateType, response);
-        });
+        this._EventNewPresenter.setViewState(FORM_STATE.SAVING);
+        this._api.addEvent(update)
+          .then((response) => {
+            this._eventsModel.addEvent(updateType, response);
+          })
+          .catch(() => {
+            this._EventNewPresenter.setAborting();
+          });
         break;
       case USER_ACTION.DELETE_EVENT:
-        this._api.deleteEvent(update).then(() => {
-          this._eventsModel.deleteEvent(updateType, update);
-        });
+        this._eventPresenter.get(update.id).setViewState(FORM_STATE.DELETING);
+        this._api.deleteEvent(update)
+          .then(() => {
+            this._eventsModel.deleteEvent(updateType, update);
+          })
+          .catch(() => {
+            this._eventPresenter.get(update.id).setViewState(FORM_STATE.ABORTING);
+          });
         break;
     }
   }

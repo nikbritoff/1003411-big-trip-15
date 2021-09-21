@@ -1,8 +1,7 @@
 import TripEventItemView from '../view/trip-event-item.js';
 import TripEventFormView from '../view/trip-event-form.js';
-// import { MODE } from '../const/const.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
-import { USER_ACTION, UPDATE_TYPE, MODE } from '../const/const.js';
+import { USER_ACTION, UPDATE_TYPE, MODE, FORM_STATE } from '../const/const.js';
 
 export default class Event {
   constructor(eventsListElement, changeData, changeMode, destinations, offers) {
@@ -57,7 +56,8 @@ export default class Event {
     }
 
     if (this._mode === MODE.EDITING) {
-      replace(this._eventFormComponent, prevFormComponent);
+      // replace(this._eventFormComponent, prevFormComponent);
+      replace(this._eventItemComponent, prevFormComponent);
     }
 
     remove(prevItemComponent);
@@ -73,6 +73,46 @@ export default class Event {
   destroy() {
     remove(this._eventItemComponent);
     remove(this._eventFormComponent);
+  }
+
+  setSaving() {
+    this._eventFormComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setViewState(state) {
+    if (this._mode === MODE.DEFAULT) {
+      return;
+    }
+
+    const resetFormState = () => {
+      this._eventFormComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case FORM_STATE.SAVING:
+        this._eventFormComponent.updateData({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case FORM_STATE.DELETING:
+        this._eventFormComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case FORM_STATE.ABORTING:
+        this._eventFormComponent.shake(resetFormState);
+        this._eventItemComponent.shake(resetFormState);
+
+    }
   }
 
   _replaceItemToForm() {
@@ -91,7 +131,7 @@ export default class Event {
   _escKeyDownHandler(evt) {
     if (evt.key === 'Esc' || evt.key === 'Escape') {
       evt.preventDefault();
-      this._eventFormComponent.reset(this._event, true);
+      this._eventFormComponent.reset(this._event, false);
       document.removeEventListener('keydown', this._escKeyDownHandler);
       this._replaceFormToItem();
     }
@@ -135,7 +175,6 @@ export default class Event {
       update,
     );
     document.removeEventListener('keydown', this._escKeyDownHandler);
-    this._replaceFormToItem();
   }
 
   _deleteClickHandler(event) {
