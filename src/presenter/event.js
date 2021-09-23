@@ -117,8 +117,10 @@ export default class Event {
   }
 
   _replaceItemToForm() {
+    this._eventFormComponent.setEditCloseCLickHandler(this._handleCloseEditClick);
     replace(this._eventFormComponent, this._eventItemComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
+    this._eventFormComponent.restoreHandlers();
     this._changeMode();
     this._mode = Mode.EDITING;
   }
@@ -126,6 +128,7 @@ export default class Event {
   _replaceFormToItem() {
     replace(this._eventItemComponent, this._eventFormComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
+    this._eventFormComponent.removeHandlers();
     this._mode = Mode.DEFAULT;
   }
 

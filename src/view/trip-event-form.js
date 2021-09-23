@@ -310,6 +310,15 @@ export default class TripEventForm extends Smart{
     this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
+  removeHandlers() {
+    this._removeInnerHandlers();
+    this.getElement().querySelector('.event__reset-btn').removeEventListener('click', this._formDeleteClickHandler);
+    this._datepickerDateTo.destroy();
+    this._datepickerDateTo = null;
+    this._datepickerDateFrom.destroy();
+    this._datepickerDateFrom = null;
+  }
+
   _setInnerHandlers() {
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._eventTypeListClickHandler);
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceInputHandler);
@@ -320,6 +329,19 @@ export default class TripEventForm extends Smart{
 
     if (this.getElement().querySelector('.event__section--offers') !== null) {
       this.getElement().querySelector('.event__section--offers').addEventListener('change', this._offersClickHandler);
+    }
+  }
+
+  _removeInnerHandlers() {
+    this.getElement().querySelector('.event__type-list').removeEventListener('click', this._eventTypeListClickHandler);
+    this.getElement().querySelector('.event__input--price').removeEventListener('input', this._priceInputHandler);
+    this.getElement().querySelector('.event__input--destination').removeEventListener('change', this._destinationChangeHandler);
+
+    this.getElement().querySelector('#event-end-time-1').removeEventListener('input', this._eventEndTimeInputHandler);
+    this.getElement().querySelector('#event-start-time-1').removeEventListener('input', this._eventStartTimeInputHandler);
+
+    if (this.getElement().querySelector('.event__section--offers') !== null) {
+      this.getElement().querySelector('.event__section--offers').removeEventListener('change', this._offersClickHandler);
     }
   }
 
