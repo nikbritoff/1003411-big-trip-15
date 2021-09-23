@@ -65,4 +65,6 @@ const compareNumbericAmount = (a, b) => {
   }
 };
 
-export {updateArrayElement, convertTimeFromMiliseconds, compareNumbericMoney, compareNumbericTime, compareNumbericAmount};
+const isOnline = () => window.navigator.onLine;
+
+export {updateArrayElement, convertTimeFromMiliseconds, compareNumbericMoney, compareNumbericTime, compareNumbericAmount, isOnline};

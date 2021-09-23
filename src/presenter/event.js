@@ -1,5 +1,7 @@
 import TripEventItemView from '../view/trip-event-item.js';
 import TripEventFormView from '../view/trip-event-form.js';
+import { isOnline } from '../utils/common.js';
+import { toast } from '../utils/toast.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
 import { USER_ACTION, UPDATE_TYPE, MODE, FORM_STATE } from '../const/const.js';
 
@@ -56,7 +58,6 @@ export default class Event {
     }
 
     if (this._mode === MODE.EDITING) {
-      // replace(this._eventFormComponent, prevFormComponent);
       replace(this._eventItemComponent, prevFormComponent);
     }
 
@@ -138,6 +139,11 @@ export default class Event {
   }
 
   _handleEditClick() {
+    if (!isOnline()) {
+      toast('You can\'t edit event offline');
+      return;
+    }
+
     this._replaceItemToForm();
   }
 
@@ -168,6 +174,11 @@ export default class Event {
   }
 
   _handleFormSubmit(update) {
+    if (!isOnline()) {
+      toast('You can\'t save event offline');
+      return;
+    }
+
     // Здесь вызывается метод _handleViewAction
     this._changeData(
       USER_ACTION.UPDATE_EVENT,
@@ -178,6 +189,11 @@ export default class Event {
   }
 
   _deleteClickHandler(event) {
+    if (!isOnline()) {
+      toast('You can\'t delete event offline');
+      return;
+    }
+
     this._changeData(
       USER_ACTION.DELETE_EVENT,
       UPDATE_TYPE.MAJOR,
