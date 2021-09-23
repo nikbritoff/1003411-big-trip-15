@@ -12,8 +12,9 @@ import LoadingView from '../view/loading.js';
 
 
 export default class Trip {
-  constructor(siteTripMainElement, tripEventsElement, eventsModel, filterModel, api) {
+  constructor(siteTripMainElement, tripEventsElement, eventsModel, filterModel, api, addNewEventButtonComponent) {
     this._eventsModel = eventsModel;
+    this._addNewEventButtonComponent = addNewEventButtonComponent;
     this._siteTripMainComponent = siteTripMainElement;
     this._tripEventsComponent = tripEventsElement;
     this._siteNavigationComponent = this._siteTripMainComponent.querySelector('.trip-controls__navigation');
@@ -29,14 +30,13 @@ export default class Trip {
     this._noEventsComponent = null;
     this._isLoading = true;
     this._api = api;
-
     this._loadingComponent  = new LoadingView();
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
-    this._eventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._handleViewAction, this._eventsModel);
+    this._eventNewPresenter = new EventNewPresenter(this._eventsListComponent, this._handleViewAction, this._eventsModel, this._addNewEventButtonComponent);
 
     this.createEvent = this.createEvent.bind(this);
     this.isHidden = false;

@@ -40,9 +40,11 @@ const filterPresenter = new FilterPresenter(
 filterPresenter.init();
 
 let statiscticsComponent = null;
-const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEvents, eventsModel, filterModel, apiWithProvider, statiscticsComponent);
 
 const siteMenuComponent = new SiteMenuView();
+const addNewEventButtonComponent = new AddNewEventView();
+render(siteTripMainElement, addNewEventButtonComponent, RenderPosition.BEFOREEND);
+const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEvents, eventsModel, filterModel, apiWithProvider, addNewEventButtonComponent);
 
 const handleAddNewEventButtonClick = () => {
   siteMenuComponent.setActiveMenuItem(MENU_ITEM.EVENTS);
@@ -54,8 +56,6 @@ const handleAddNewEventButtonClick = () => {
   remove(statiscticsComponent);
 };
 
-const addNewEventButtonComponent = new AddNewEventView();
-render(siteTripMainElement, addNewEventButtonComponent, RenderPosition.BEFOREEND);
 addNewEventButtonComponent.setAddNewButtonClickHandler(handleAddNewEventButtonClick);
 
 const handleSiteMenuClick = (menuItem) => {

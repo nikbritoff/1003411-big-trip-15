@@ -3,11 +3,12 @@ import { remove, render, RenderPosition } from '../utils/render.js';
 import { EVENT_FORM_MODE, USER_ACTION, UPDATE_TYPE, FORM_STATE } from '../const/const.js';
 
 export default class EventNew {
-  constructor(eventsListElement, changeData, eventsModel) {
+  constructor(eventsListElement, changeData, eventsModel, addNewEventButtonComponent) {
     this._eventsListElement = eventsListElement;
     this._changeData = changeData;
     this._eventsModel = eventsModel;
     this._eventEditComponent = null;
+    this._addNewEventButtonComponent = addNewEventButtonComponent;
 
     this._handleCancelClick = this._handleCancelClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
@@ -33,6 +34,8 @@ export default class EventNew {
     if (this._eventEditComponent === null) {
       return;
     }
+
+    this._addNewEventButtonComponent.changeDisabled();
 
     remove(this._eventEditComponent);
     this._eventEditComponent = null;
