@@ -15,12 +15,6 @@ export default class AddNewEvent extends AbstractView {
     return createAddNewButtonTemplate();
   }
 
-  _addNewButtonClickHandler(evt) {
-    evt.preventDefault();
-    this.changeDisabled();
-    this._callback.buttonClick();
-  }
-
   setAddNewButtonClickHandler(callback) {
     this._callback.buttonClick = callback;
     this.getElement().addEventListener('click', this._addNewButtonClickHandler);
@@ -28,5 +22,11 @@ export default class AddNewEvent extends AbstractView {
 
   changeDisabled() {
     this.getElement().disabled = !this.getElement().disabled;
+  }
+
+  _addNewButtonClickHandler(evt) {
+    evt.preventDefault();
+    this.changeDisabled();
+    this._callback.buttonClick();
   }
 }

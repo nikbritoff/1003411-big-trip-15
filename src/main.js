@@ -27,7 +27,7 @@ const apiWithProvider = new Provider(api, store);
 
 const pageBodyContainerElement = document.querySelector('main .page-body__container');
 const siteTripMainElement = document.querySelector('.trip-main');
-const siteTripEvents = document.querySelector('.trip-events');
+const siteTripEventsElement = document.querySelector('.trip-events');
 // Model
 const eventsModel = new EventsModel();
 const filterModel = new FilterModel();
@@ -44,7 +44,7 @@ let statiscticsComponent = null;
 const siteMenuComponent = new SiteMenuView();
 const addNewEventButtonComponent = new AddNewEventView();
 render(siteTripMainElement, addNewEventButtonComponent, RenderPosition.BEFOREEND);
-const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEvents, eventsModel, filterModel, apiWithProvider, addNewEventButtonComponent);
+const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEventsElement, eventsModel, filterModel, apiWithProvider, addNewEventButtonComponent);
 
 const handleAddNewEventButtonClick = () => {
   siteMenuComponent.setActiveMenuItem(MenuItem.EVENTS);

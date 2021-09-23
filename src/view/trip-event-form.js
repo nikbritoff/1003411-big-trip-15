@@ -7,6 +7,20 @@ import Smart from './smart';
 import { EVENT_TYPES } from '../const/const.js';
 import he from 'he';
 
+const DEFAULT_EVENT = {
+  type: 'drive',
+  destination: {
+    name: '',
+    description: '',
+    pictures: [],
+  },
+  basePrice: 0,
+  isFavorite: false,
+  dateFrom: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+  options: [],
+  dateTo: dayjs().add(1, 'day').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+};
+
 const setResetFormButtonText = (isNew, isDeleting) => {
   if (isNew && isDeleting) {
     return 'Canceling...';
@@ -23,6 +37,35 @@ const setResetFormButtonText = (isNew, isDeleting) => {
   return 'Delete';
 };
 
+const setPictures = (pictures) => {
+  let images = '';
+
+  pictures.forEach((image) => {
+    images += `<img class="event__photo" src="${image.src}" alt="${image.description}">`;
+  });
+
+  return `<div class="event__photos-container">
+            <div class="event__photos-tape">
+              ${images}
+            </div>
+          </div>`;
+};
+
+const setEventDescription = (destination, isHasPictures) => {
+  if (!destination.description && isHasPictures === 0) {
+    return '';
+  } else {
+    const destinationDescription = destination.description ? `<p class="event__destination-description">${he.encode(destination.description)}</p>'` : '';
+    const destinationPictures = setPictures(destination.pictures);
+    return (
+      `<section class="event__section  event__section--destination">
+        <h3 class="event__section-title  event__section-title--destination">${he.encode(destination.name)}</h3>
+        ${destinationDescription}
+        ${destinationPictures}
+    </section>`
+    );
+  }
+};
 
 const setOptions = (options, selectedType, offers, isDisabled) => {
   if (!offers) {
@@ -90,36 +133,6 @@ const createFormEventTypeTemplate = (types, currentType) => {
   `);
 };
 
-const setPictures = (pictures) => {
-  let images = '';
-
-  pictures.forEach((image) => {
-    images += `<img class="event__photo" src="${image.src}" alt="${image.description}">`;
-  });
-
-  return `<div class="event__photos-container">
-            <div class="event__photos-tape">
-              ${images}
-            </div>
-          </div>`;
-};
-
-const setEventDescription = (destination, isHasPictures) => {
-  if (!destination.description && isHasPictures === 0) {
-    return '';
-  } else {
-    const destinationDescription = destination.description ? `<p class="event__destination-description">${he.encode(destination.description)}</p>'` : '';
-    const destinationPictures = setPictures(destination.pictures);
-    return (
-      `<section class="event__section  event__section--destination">
-        <h3 class="event__section-title  event__section-title--destination">${he.encode(destination.name)}</h3>
-        ${destinationDescription}
-        ${destinationPictures}
-    </section>`
-    );
-  }
-};
-
 const createEventFormTemplate = (data, isNew, destinations, offers) => {
   const {type, destination, options, basePrice, dateFrom, dateTo, isDisabled, isSaving, isDeleting} = data;
   const targetOffer = offers.find((offer) => offer.type === type).offers;
@@ -171,20 +184,6 @@ const createEventFormTemplate = (data, isNew, destinations, offers) => {
     </section>
   </form>
 </li>`;
-};
-
-const DEFAULT_EVENT = {
-  type: 'drive',
-  destination: {
-    name: '',
-    description: '',
-    pictures: [],
-  },
-  basePrice: 0,
-  isFavorite: false,
-  dateFrom: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
-  options: [],
-  dateTo: dayjs().add(1, 'day').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
 };
 
 export default class TripEventForm extends Smart{

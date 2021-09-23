@@ -65,22 +65,15 @@ export default class Event {
     remove(prevFormComponent);
   }
 
-  resetView() {
-    if (this._mode !== Mode.DEFAULT) {
-      this._replaceFormToItem();
-    }
-  }
-
   destroy() {
     remove(this._eventItemComponent);
     remove(this._eventFormComponent);
   }
 
-  setSaving() {
-    this._eventFormComponent.updateData({
-      isDisabled: true,
-      isSaving: true,
-    });
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._replaceFormToItem();
+    }
   }
 
   setViewState(state) {
@@ -114,6 +107,13 @@ export default class Event {
         this._eventItemComponent.shake(resetFormState);
 
     }
+  }
+
+  setSaving() {
+    this._eventFormComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
   }
 
   _replaceItemToForm() {

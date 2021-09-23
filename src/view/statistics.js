@@ -260,16 +260,16 @@ export default class Statistics extends Smart{
       this._typeChart = null;
     }
 
-    const typeCtx = this.getElement().querySelector('#type');
-    const moneyCtx = this.getElement().querySelector('#money');
-    const timeCtx = this.getElement().querySelector('#time-spend');
+    const typeChartElement = this.getElement().querySelector('#type');
+    const moneyChartElement = this.getElement().querySelector('#money');
+    const timeChartElement = this.getElement().querySelector('#time-spend');
 
     this._uniqueTripEventsTypes = this._getUniqueTripEventsTypes();
     this._tripEventsChartData = this._getTripEventsChartData();
 
-    this._typeChart = renderTypeChart(typeCtx, this._tripEventsChartData);
-    this._moneyChart = renderMoneyChart(moneyCtx, this._tripEventsChartData);
-    this._timeSpendChart = renderTimeSpentChart(timeCtx, this._tripEventsChartData);
+    this._typeChart = renderTypeChart(typeChartElement, this._tripEventsChartData);
+    this._moneyChart = renderMoneyChart(moneyChartElement, this._tripEventsChartData);
+    this._timeSpendChart = renderTimeSpentChart(timeChartElement, this._tripEventsChartData);
   }
 
   _getUniqueTripEventsTypes() {

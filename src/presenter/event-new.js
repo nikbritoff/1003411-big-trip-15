@@ -42,13 +42,6 @@ export default class EventNew {
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
-  setSaving() {
-    this._eventEditComponent.updateData({
-      isDisabled: true,
-      isSaving: true,
-    });
-  }
-
   setViewState(state) {
     switch (state) {
       case FormState.SAVING:
@@ -66,6 +59,13 @@ export default class EventNew {
     }
   }
 
+  setSaving() {
+    this._eventEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
   setAborting() {
     const resetFormState = () => {
       this._eventEditComponent.updateData({
@@ -76,6 +76,13 @@ export default class EventNew {
     };
 
     this._eventEditComponent.shake(resetFormState);
+  }
+
+  _escKeyDownHandler(evt) {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.destroy();
+    }
   }
 
   _handleFormSubmit(event) {
@@ -90,12 +97,5 @@ export default class EventNew {
 
   _handleCancelClick() {
     this.destroy();
-  }
-
-  _escKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this.destroy();
-    }
   }
 }
