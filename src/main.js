@@ -9,7 +9,7 @@ import FilterPresenter from './presenter/filter.js';
 import SiteMenuView from './view/site-menu.js';
 import StatisticsView from './view/statistics.js';
 import AddNewEventView from './view/site-add-new-event.js';
-import { MENU_ITEM } from './const/const.js';
+import { MenuItem } from './const/const.js';
 import { RenderPosition, render, remove } from './utils/render.js';
 import { isOnline } from './utils/common.js';
 import { toast } from './utils/toast.js';
@@ -47,7 +47,7 @@ render(siteTripMainElement, addNewEventButtonComponent, RenderPosition.BEFOREEND
 const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEvents, eventsModel, filterModel, apiWithProvider, addNewEventButtonComponent);
 
 const handleAddNewEventButtonClick = () => {
-  siteMenuComponent.setActiveMenuItem(MENU_ITEM.EVENTS);
+  siteMenuComponent.setActiveMenuItem(MenuItem.EVENTS);
   if (!isOnline()) {
     toast('You can\'t create new trip event offline');
     return;
@@ -60,7 +60,7 @@ addNewEventButtonComponent.setAddNewButtonClickHandler(handleAddNewEventButtonCl
 
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
-    case MENU_ITEM.EVENTS:
+    case MenuItem.EVENTS:
       // Показать все точки маршрута
       if (tripPresenter.isHidden) {
         tripPresenter.init();
@@ -69,7 +69,7 @@ const handleSiteMenuClick = (menuItem) => {
       }
 
       break;
-    case MENU_ITEM.STATISTICS:
+    case MenuItem.STATISTICS:
       siteMenuComponent.setActiveMenuItem(menuItem);
       // Скрыть точки маршрута
       tripPresenter.destroy();

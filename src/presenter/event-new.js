@@ -1,6 +1,6 @@
 import TripEventFormView from '../view/trip-event-form.js';
 import { remove, render, RenderPosition } from '../utils/render.js';
-import { EVENT_FORM_MODE, USER_ACTION, UPDATE_TYPE, FORM_STATE } from '../const/const.js';
+import { EventFormMode, UserAction, UpdateType, FormState } from '../const/const.js';
 
 export default class EventNew {
   constructor(eventsListElement, changeData, eventsModel, addNewEventButtonComponent) {
@@ -51,13 +51,13 @@ export default class EventNew {
 
   setViewState(state) {
     switch (state) {
-      case FORM_STATE.SAVING:
+      case FormState.SAVING:
         this._eventEditComponent.updateData({
           isDisabled: true,
           isSaving: true,
         });
         break;
-      case FORM_STATE.DELETING:
+      case FormState.DELETING:
         this._eventEditComponent.updateData({
           isDisabled: true,
           isDeleting: true,
@@ -81,11 +81,11 @@ export default class EventNew {
   _handleFormSubmit(event) {
     // handle view action
     this._changeData(
-      USER_ACTION.ADD_EVENT,
-      UPDATE_TYPE.MAJOR,
+      UserAction.ADD_EVENT,
+      UpdateType.MAJOR,
       event,
     );
-    this._eventFormMode = EVENT_FORM_MODE.edit;
+    this._eventFormMode = EventFormMode.edit;
   }
 
   _handleCancelClick() {

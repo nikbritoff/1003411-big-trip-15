@@ -3,7 +3,7 @@ import TripEventFormView from '../view/trip-event-form.js';
 import { isOnline } from '../utils/common.js';
 import { toast } from '../utils/toast.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
-import { USER_ACTION, UPDATE_TYPE, MODE, FORM_STATE } from '../const/const.js';
+import { UserAction, UpdateType, Mode, FormState } from '../const/const.js';
 
 export default class Event {
   constructor(eventsListElement, changeData, changeMode, destinations, offers) {
@@ -17,7 +17,7 @@ export default class Event {
     this._offers = offers;
     this._destinations = destinations;
 
-    this._mode = MODE.DEFAULT;
+    this._mode = Mode.DEFAULT;
 
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
@@ -53,11 +53,11 @@ export default class Event {
       return;
     }
 
-    if (this._mode === MODE.DEFAULT) {
+    if (this._mode === Mode.DEFAULT) {
       replace(this._eventItemComponent, prevItemComponent);
     }
 
-    if (this._mode === MODE.EDITING) {
+    if (this._mode === Mode.EDITING) {
       replace(this._eventItemComponent, prevFormComponent);
     }
 
@@ -66,7 +66,7 @@ export default class Event {
   }
 
   resetView() {
-    if (this._mode !== MODE.DEFAULT) {
+    if (this._mode !== Mode.DEFAULT) {
       this._replaceFormToItem();
     }
   }
@@ -84,7 +84,7 @@ export default class Event {
   }
 
   setViewState(state) {
-    if (this._mode === MODE.DEFAULT) {
+    if (this._mode === Mode.DEFAULT) {
       return;
     }
 
@@ -97,19 +97,19 @@ export default class Event {
     };
 
     switch (state) {
-      case FORM_STATE.SAVING:
+      case FormState.SAVING:
         this._eventFormComponent.updateData({
           isDisabled: true,
           isSaving: true,
         });
         break;
-      case FORM_STATE.DELETING:
+      case FormState.DELETING:
         this._eventFormComponent.updateData({
           isDisabled: true,
           isDeleting: true,
         });
         break;
-      case FORM_STATE.ABORTING:
+      case FormState.ABORTING:
         this._eventFormComponent.shake(resetFormState);
         this._eventItemComponent.shake(resetFormState);
 
@@ -120,13 +120,13 @@ export default class Event {
     replace(this._eventFormComponent, this._eventItemComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
     this._changeMode();
-    this._mode = MODE.EDITING;
+    this._mode = Mode.EDITING;
   }
 
   _replaceFormToItem() {
     replace(this._eventItemComponent, this._eventFormComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
-    this._mode = MODE.DEFAULT;
+    this._mode = Mode.DEFAULT;
   }
 
   _escKeyDownHandler(evt) {
@@ -153,8 +153,8 @@ export default class Event {
 
   _handleFavoriteClick() {
     this._changeData(
-      USER_ACTION.UPDATE_EVENT,
-      UPDATE_TYPE.PATCH,
+      UserAction.UPDATE_EVENT,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._event,
@@ -181,8 +181,8 @@ export default class Event {
 
     // Здесь вызывается метод _handleViewAction
     this._changeData(
-      USER_ACTION.UPDATE_EVENT,
-      UPDATE_TYPE.MAJOR,
+      UserAction.UPDATE_EVENT,
+      UpdateType.MAJOR,
       update,
     );
     document.removeEventListener('keydown', this._escKeyDownHandler);
@@ -195,8 +195,8 @@ export default class Event {
     }
 
     this._changeData(
-      USER_ACTION.DELETE_EVENT,
-      UPDATE_TYPE.MAJOR,
+      UserAction.DELETE_EVENT,
+      UpdateType.MAJOR,
       event,
     );
   }

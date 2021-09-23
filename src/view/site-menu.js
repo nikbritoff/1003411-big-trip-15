@@ -1,10 +1,10 @@
 import AbstractView from './abstract.js';
-import { MENU_ITEM } from '../const/const.js';
+import { MenuItem } from '../const/const.js';
 
 const createSiteMenuTemplate = () => (
   `<nav class="trip-controls__trip-tabs  trip-tabs">
-    <a class="trip-tabs__btn  trip-tabs__btn--active" href="#" data-menu-item="${MENU_ITEM.EVENTS}"">Table</a>
-    <a class="trip-tabs__btn" href="#" data-menu-item="${MENU_ITEM.STATISTICS}">Stats</a>
+    <a class="trip-tabs__btn  trip-tabs__btn--active" href="#" data-menu-item="${MenuItem.EVENTS}"">Table</a>
+    <a class="trip-tabs__btn" href="#" data-menu-item="${MenuItem.STATISTICS}">Stats</a>
   </nav>`
 );
 
