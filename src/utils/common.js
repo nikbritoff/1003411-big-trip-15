@@ -1,17 +1,3 @@
-const updateArrayElement = (array, update) => {
-  const index = array.findIndex((element) => element.id === update.id);
-
-  if (index === -1) {
-    return array;
-  }
-
-  return [
-    ...array.slice(0, index),
-    update,
-    ...array.slice(index + 1),
-  ];
-};
-
 const convertTimeFromMiliseconds = (miliseconds) => {
   const minuteFromMiliseconds = 1000 * 60;
   const hourFromMinutes = minuteFromMiliseconds * 60;
@@ -67,4 +53,4 @@ const compareNumbericAmount = (a, b) => {
 
 const isOnline = () => window.navigator.onLine;
 
-export {updateArrayElement, convertTimeFromMiliseconds, compareNumbericMoney, compareNumbericTime, compareNumbericAmount, isOnline};
+export { convertTimeFromMiliseconds, compareNumbericMoney, compareNumbericTime, compareNumbericAmount, isOnline};
