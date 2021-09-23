@@ -20,7 +20,7 @@ export default class AddNewEvent extends AbstractView {
     this._callback.buttonClick();
   }
 
-  setAddNewButtonClickHabdler(callback) {
+  setAddNewButtonClickHandler(callback) {
     this._callback.buttonClick = callback;
     this.getElement().addEventListener('click', this._addNewButtonClickHandler);
   }

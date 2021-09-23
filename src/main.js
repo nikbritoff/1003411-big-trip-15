@@ -56,7 +56,7 @@ const handleAddNewEventButtonClick = () => {
 
 const addNewEventButtonComponent = new AddNewEventView();
 render(siteTripMainElement, addNewEventButtonComponent, RenderPosition.BEFOREEND);
-addNewEventButtonComponent.setAddNewButtonClickHabdler(handleAddNewEventButtonClick);
+addNewEventButtonComponent.setAddNewButtonClickHandler(handleAddNewEventButtonClick);
 
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
