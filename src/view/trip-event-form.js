@@ -222,21 +222,9 @@ export default class TripEventForm extends Smart{
     return createEventFormTemplate(this._data, this._isNew, this._destinations, this._offers);
   }
 
-  _editSubmitHandler(evt) {
-    evt.preventDefault();
-    if (this._checkPriceValidity() && this._checkDestinationValidity()) {
-      this._callback.editSubmit(TripEventForm.parseDataToEvent(this._data));
-    }
-  }
-
   setSubmitHandler(callback) {
     this._callback.editSubmit = callback;
     this.getElement().addEventListener('submit', this._editSubmitHandler);
-  }
-
-  _editCloseClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.closeEditClickHandler();
   }
 
   setEditCloseCLickHandler(callback) {
@@ -244,61 +232,27 @@ export default class TripEventForm extends Smart{
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editCloseClickHandler);
   }
 
-  // VIEW 6
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
+  }
 
-  static parseEventToData(event) {
-    return Object.assign(
-      {},
-      event,
-      {
-        isHasOptions: event.options.length,
-        isHasPictures: event.destination.pictures.length,
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false,
-      },
+  // Model
+  reset(event, justUpdating) {
+    this.updateData(
+      TripEventForm.parseDataToEvent(event),
+      justUpdating,
     );
   }
 
-  static parseDataToEvent(data) {
-    data = Object.assign({}, data);
+  removeElement() {
+    super.removeElement();
 
-    delete data.isHasOptions;
-    delete data.isHasPictures;
-    delete data.isDisabled;
-    delete data.isSaving;
-    delete data.isDeleting;
-
-    return data;
-  }
-
-  _eventTypeListClickHandler(evt) {
-    evt.preventDefault();
-
-    if (evt.target.tagName === 'LABEL') {
-      const selectedType = evt.target.previousElementSibling.value;
-      this.updateData({
-        type: selectedType,
-        options: [],
-      }, false);
-    }
-  }
-
-  _destinationChangeHandler(evt) {
-    evt.preventDefault();
-    const selectedDestinationName = evt.target.value;
-
-    if (this._checkDestinationValidity()) {
-      const destinationInfo = this._destinations.find((destination) => destination.name === selectedDestinationName);
-      const description = destinationInfo.description;
-      const pictures = destinationInfo.pictures;
-      this.updateData({
-        destination: {
-          name: selectedDestinationName,
-          description: description,
-          pictures: pictures,
-        },
-      }, false);
+    if (this._datepickerDateFrom || this._datepickerDateTo) {
+      this._datepickerDateTo.destroy();
+      this._datepickerDateTo = null;
+      this._datepickerDateFrom.destroy();
+      this._datepickerDateFrom = null;
     }
   }
 
@@ -317,6 +271,37 @@ export default class TripEventForm extends Smart{
     this._datepickerDateTo = null;
     this._datepickerDateFrom.destroy();
     this._datepickerDateFrom = null;
+  }
+
+  _checkPriceValidity() {
+    const priceInputElement = this.getElement().querySelector('.event__input--price');
+    priceInputElement.setCustomValidity('');
+    if (priceInputElement.value > 0) {
+      priceInputElement.setCustomValidity('');
+      priceInputElement.reportValidity();
+      return true;
+    } else {
+      priceInputElement.setCustomValidity('Стоимость должна быть целым положительным числом.');
+      priceInputElement.reportValidity();
+      return false;
+    }
+  }
+
+  _checkDestinationValidity() {
+    // Проверка на наличие города в списке назначений
+    const destinationInputElement = this.getElement().querySelector('.event__input--destination');
+    const selectedDestinationName = destinationInputElement.value;
+    const isInDestinations = this._destinations.some((destination) => destination.name === selectedDestinationName);
+    destinationInputElement.setCustomValidity('');
+    if (isInDestinations) {
+      destinationInputElement.setCustomValidity('');
+      destinationInputElement.reportValidity();
+      return true;
+    } else {
+      destinationInputElement.setCustomValidity('Пункт назначения не сооотвествует ни одному из указанным в списке');
+      destinationInputElement.reportValidity();
+      return false;
+    }
   }
 
   _setInnerHandlers() {
@@ -343,37 +328,6 @@ export default class TripEventForm extends Smart{
     if (this.getElement().querySelector('.event__section--offers') !== null) {
       this.getElement().querySelector('.event__section--offers').removeEventListener('change', this._offersClickHandler);
     }
-  }
-
-  _priceInputHandler(evt) {
-    evt.preventDefault();
-
-    if (this._checkPriceValidity()) {
-      // Все нечисловые символы удаляются при сохранении
-      this.updateData({
-        basePrice: Number(evt.target.value.replace(/[^\d]/g, '')),
-      }, true);
-    }
-  }
-
-  reset(event, justUpdating) {
-    this.updateData(
-      TripEventForm.parseDataToEvent(event),
-      justUpdating,
-    );
-  }
-
-  // Datepicker
-  _dateFromChangeHandler([userData]) {
-    this.updateData({
-      dateFrom: dayjs([userData]).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
-    }, true);
-  }
-
-  _dateToChangekHandler([userData]) {
-    this.updateData({
-      dateTo: dayjs([userData]).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
-    }, true);
   }
 
   _setDatepickerDateFrom() {
@@ -414,6 +368,72 @@ export default class TripEventForm extends Smart{
     this._setDatepickerDateFrom();
   }
 
+  _editSubmitHandler(evt) {
+    evt.preventDefault();
+    if (this._checkPriceValidity() && this._checkDestinationValidity()) {
+      this._callback.editSubmit(TripEventForm.parseDataToEvent(this._data));
+    }
+  }
+
+  _editCloseClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeEditClickHandler();
+  }
+
+  _eventTypeListClickHandler(evt) {
+    evt.preventDefault();
+
+    if (evt.target.tagName === 'LABEL') {
+      const selectedType = evt.target.previousElementSibling.value;
+      this.updateData({
+        type: selectedType,
+        options: [],
+      }, false);
+    }
+  }
+
+  _destinationChangeHandler(evt) {
+    evt.preventDefault();
+    const selectedDestinationName = evt.target.value;
+
+    if (this._checkDestinationValidity()) {
+      const destinationInfo = this._destinations.find((destination) => destination.name === selectedDestinationName);
+      const description = destinationInfo.description;
+      const pictures = destinationInfo.pictures;
+      this.updateData({
+        destination: {
+          name: selectedDestinationName,
+          description: description,
+          pictures: pictures,
+        },
+      }, false);
+    }
+  }
+
+  _priceInputHandler(evt) {
+    evt.preventDefault();
+
+    if (this._checkPriceValidity()) {
+      // Все нечисловые символы удаляются при сохранении
+      this.updateData({
+        basePrice: Number(evt.target.value.replace(/[^\d]/g, '')),
+      }, true);
+    }
+  }
+
+  // Datepicker
+  _dateFromChangeHandler([userData]) {
+    this.updateData({
+      dateFrom: dayjs([userData]).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+    }, true);
+  }
+
+  _dateToChangekHandler([userData]) {
+    this.updateData({
+      dateTo: dayjs([userData]).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+    }, true);
+  }
+
   _eventEndTimeInputHandler() {
     this._setDatepickerDateFrom();
   }
@@ -422,58 +442,9 @@ export default class TripEventForm extends Smart{
     this._setDatepickerDateTo();
   }
 
-
-  // Model
-  removeElement() {
-    super.removeElement();
-
-    if (this._datepickerDateFrom || this._datepickerDateTo) {
-      this._datepickerDateTo.destroy();
-      this._datepickerDateTo = null;
-      this._datepickerDateFrom.destroy();
-      this._datepickerDateFrom = null;
-    }
-  }
-
   _formDeleteClickHandler(evt) {
     evt.preventDefault();
     this._callback.deleteClick(TripEventForm.parseDataToEvent(this._data));
-  }
-
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
-  }
-
-  _checkPriceValidity() {
-    const priceInputElement = this.getElement().querySelector('.event__input--price');
-    priceInputElement.setCustomValidity('');
-    if (priceInputElement.value > 0) {
-      priceInputElement.setCustomValidity('');
-      priceInputElement.reportValidity();
-      return true;
-    } else {
-      priceInputElement.setCustomValidity('Стоимость должна быть целым положительным числом.');
-      priceInputElement.reportValidity();
-      return false;
-    }
-  }
-
-  _checkDestinationValidity() {
-    // Проверка на наличие города в списке назначений
-    const destinationInputElement = this.getElement().querySelector('.event__input--destination');
-    const selectedDestinationName = destinationInputElement.value;
-    const isInDestinations = this._destinations.some((destination) => destination.name === selectedDestinationName);
-    destinationInputElement.setCustomValidity('');
-    if (isInDestinations) {
-      destinationInputElement.setCustomValidity('');
-      destinationInputElement.reportValidity();
-      return true;
-    } else {
-      destinationInputElement.setCustomValidity('Пункт назначения не сооотвествует ни одному из указанным в списке');
-      destinationInputElement.reportValidity();
-      return false;
-    }
   }
 
   _offersClickHandler(evt) {
@@ -491,5 +462,31 @@ export default class TripEventForm extends Smart{
         ...this._data.options.slice(selectedOfferIndex + 1),
       ];
     }
+  }
+
+  static parseEventToData(event) {
+    return Object.assign(
+      {},
+      event,
+      {
+        isHasOptions: event.options.length,
+        isHasPictures: event.destination.pictures.length,
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      },
+    );
+  }
+
+  static parseDataToEvent(data) {
+    data = Object.assign({}, data);
+
+    delete data.isHasOptions;
+    delete data.isHasPictures;
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
+
+    return data;
   }
 }
