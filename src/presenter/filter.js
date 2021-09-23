@@ -1,6 +1,6 @@
 import SiteFilterWiew from '../view/site-filter.js';
 import { render, RenderPosition, replace, remove } from '../utils/render.js';
-import { FilterType, UpdateType } from '../const/const.js';
+import { UpdateType, FILTERS } from '../const/const.js';
 
 export default class Filter {
   constructor(filterContainer, filterModel) {
@@ -16,7 +16,7 @@ export default class Filter {
   }
 
   init() {
-    const filters = this._getFilters();
+    const filters = FILTERS;
 
     const prevFilterComponent = this._filterComponent;
 
@@ -42,22 +42,5 @@ export default class Filter {
     }
 
     this._filterModel.setFilter(UpdateType.MAJOR, filterType);
-  }
-
-  _getFilters() {
-    return [
-      {
-        type: FilterType.EVERYTHING,
-        name: 'EVERYTHING',
-      },
-      {
-        type: FilterType.FUTURE,
-        name: 'FUTURE',
-      },
-      {
-        type: FilterType.PAST,
-        name: 'PAST',
-      },
-    ];
   }
 }

@@ -1,9 +1,13 @@
 const convertTimeFromMiliseconds = (miliseconds) => {
-  const minuteFromMiliseconds = 1000 * 60;
-  const hourFromMinutes = minuteFromMiliseconds * 60;
-  const dayFromHours = hourFromMinutes * 24;
+  const milisecondsInSecond = 1000;
+  const secondsInMinute = 60;
+  const minutesInHour = 60;
+  const hoursInDay = 24;
+  const minuteFromMiliseconds = milisecondsInSecond * secondsInMinute;
+  const hourFromMinutes = minuteFromMiliseconds * minutesInHour;
+  const dayFromHours = hourFromMinutes * hoursInDay;
 
-  const calculateDays = Math.floor(miliseconds / dayFromHours % 30);
+  const calculateDays = Math.floor(miliseconds / dayFromHours);
   let lostTime = miliseconds - (calculateDays * dayFromHours);
   const calculateHours = Math.floor((lostTime / hourFromMinutes) % 24);
   lostTime = miliseconds -  (calculateHours * hourFromMinutes);

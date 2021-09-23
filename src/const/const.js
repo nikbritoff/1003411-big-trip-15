@@ -48,4 +48,19 @@ const FormState = {
   ABORTING: 'ABORTING',
 };
 
-export {SortType, Mode, EventFormMode, UserAction, UpdateType, FilterType, MenuItem, EVENT_TYPES, FormState};
+const FILTERS = [
+  {
+    type: FilterType.EVERYTHING,
+    name: 'EVERYTHING',
+  },
+  {
+    type: FilterType.FUTURE,
+    name: 'FUTURE',
+  },
+  {
+    type: FilterType.PAST,
+    name: 'PAST',
+  },
+];
+
+export {SortType, Mode, EventFormMode, UserAction, UpdateType, FilterType, MenuItem, EVENT_TYPES, FormState, FILTERS};
