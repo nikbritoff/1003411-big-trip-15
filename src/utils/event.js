@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { UPDATE_TYPE } from '../const/const';
+import { UpdateType } from '../const/const';
 
 const sortDurationUp = (eventA, eventB) => {
   const durationOfEventA = dayjs(eventA.dateTo).diff(eventA.dateFrom, 'minute');
@@ -9,14 +9,14 @@ const sortDurationUp = (eventA, eventB) => {
 
 const getUpdateType = (minor, major) => {
   if (major) {
-    return UPDATE_TYPE.MAJOR;
+    return UpdateType.MAJOR;
   }
 
   if (minor) {
-    return UPDATE_TYPE.MINOR;
+    return UpdateType.MINOR;
   }
 
-  return UPDATE_TYPE.PATCH;
+  return UpdateType.PATCH;
 };
 
 const sortPriceUp = (eventA, eventB) => Number(eventB.basePrice) - Number(eventA.basePrice);

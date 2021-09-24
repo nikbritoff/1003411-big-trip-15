@@ -1,13 +1,14 @@
 import TripEventFormView from '../view/trip-event-form.js';
 import { remove, render, RenderPosition } from '../utils/render.js';
-import { EVENT_FORM_MODE, USER_ACTION, UPDATE_TYPE, FORM_STATE } from '../const/const.js';
+import { EventFormMode, UserAction, UpdateType, FormState } from '../const/const.js';
 
 export default class EventNew {
-  constructor(eventsListElement, changeData, eventsModel) {
+  constructor(eventsListElement, changeData, eventsModel, addNewEventButtonComponent) {
     this._eventsListElement = eventsListElement;
     this._changeData = changeData;
     this._eventsModel = eventsModel;
     this._eventEditComponent = null;
+    this._addNewEventButtonComponent = addNewEventButtonComponent;
 
     this._handleCancelClick = this._handleCancelClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
@@ -34,9 +35,28 @@ export default class EventNew {
       return;
     }
 
+    this._addNewEventButtonComponent.changeDisabled();
+
     remove(this._eventEditComponent);
     this._eventEditComponent = null;
     document.removeEventListener('keydown', this._escKeyDownHandler);
+  }
+
+  setViewState(state) {
+    switch (state) {
+      case FormState.SAVING:
+        this._eventEditComponent.updateData({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case FormState.DELETING:
+        this._eventEditComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+    }
   }
 
   setSaving() {
@@ -44,23 +64,6 @@ export default class EventNew {
       isDisabled: true,
       isSaving: true,
     });
-  }
-
-  setViewState(state) {
-    switch (state) {
-      case FORM_STATE.SAVING:
-        this._eventEditComponent.updateData({
-          isDisabled: true,
-          isSaving: true,
-        });
-        break;
-      case FORM_STATE.DELETING:
-        this._eventEditComponent.updateData({
-          isDisabled: true,
-          isDeleting: true,
-        });
-        break;
-    }
   }
 
   setAborting() {
@@ -75,24 +78,24 @@ export default class EventNew {
     this._eventEditComponent.shake(resetFormState);
   }
 
-  _handleFormSubmit(event) {
-    // handle view action
-    this._changeData(
-      USER_ACTION.ADD_EVENT,
-      UPDATE_TYPE.MAJOR,
-      event,
-    );
-    this._eventFormMode = EVENT_FORM_MODE.edit;
-  }
-
-  _handleCancelClick() {
-    this.destroy();
-  }
-
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.destroy();
     }
+  }
+
+  _handleFormSubmit(event) {
+    // handle view action
+    this._changeData(
+      UserAction.ADD_EVENT,
+      UpdateType.MAJOR,
+      event,
+    );
+    this._eventFormMode = EventFormMode.edit;
+  }
+
+  _handleCancelClick() {
+    this.destroy();
   }
 }

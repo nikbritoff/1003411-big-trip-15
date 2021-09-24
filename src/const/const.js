@@ -1,26 +1,26 @@
-const SORT_TYPE = {
+const SortType = {
   DEFAULT: 'default',
   PRICE: 'price',
   TIME: 'time',
 };
 
-const EVENT_FORM_MODE = {
+const EventFormMode = {
   edit: 'Delete',
   add: 'Cancel',
 };
 
-const MODE = {
+const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
 };
 
-const USER_ACTION = {
+const UserAction = {
   UPDATE_EVENT: 'UPDATE_EVENT',
   ADD_EVENT: 'ADD_EVENT',
   DELETE_EVENT: 'DELETE_EVENT',
 };
 
-const UPDATE_TYPE = {
+const UpdateType = {
   PATCH: 'PATCH',
   // Обновление только данных: установка избранного
   MINOR: 'MINOR',
@@ -29,24 +29,38 @@ const UPDATE_TYPE = {
   // Обновление всей страницы: цена, пункт назначения, дата начала/конца, удаление, добавление
 };
 
-const FILTER_TYPE = {
+const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
   PAST: 'past',
 };
 
-const MENU_ITEM = {
+const MenuItem = {
   EVENTS: 'EVENTS',
   STATISTICS: 'STATISTICS',
 };
 
 const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-const TRANSPORT_TYPES = ['Taxi', 'Bus', 'Train', 'Ship', 'Transport', 'Drive', 'Flight'];
 
-const FORM_STATE = {
+const FormState = {
   SAVING: 'SAVING',
   DELETING: 'DELETING',
   ABORTING: 'ABORTING',
 };
 
-export {SORT_TYPE, MODE, EVENT_FORM_MODE, USER_ACTION, UPDATE_TYPE, FILTER_TYPE, MENU_ITEM, EVENT_TYPES, TRANSPORT_TYPES, FORM_STATE};
+const FILTERS = [
+  {
+    type: FilterType.EVERYTHING,
+    name: 'EVERYTHING',
+  },
+  {
+    type: FilterType.FUTURE,
+    name: 'FUTURE',
+  },
+  {
+    type: FilterType.PAST,
+    name: 'PAST',
+  },
+];
+
+export {SortType, Mode, EventFormMode, UserAction, UpdateType, FilterType, MenuItem, EVENT_TYPES, FormState, FILTERS};

@@ -1,7 +1,9 @@
 import TripEventItemView from '../view/trip-event-item.js';
 import TripEventFormView from '../view/trip-event-form.js';
+import { isOnline } from '../utils/common.js';
+import { toast } from '../utils/toast.js';
 import { remove, render, RenderPosition, replace } from '../utils/render.js';
-import { USER_ACTION, UPDATE_TYPE, MODE, FORM_STATE } from '../const/const.js';
+import { UserAction, UpdateType, Mode, FormState } from '../const/const.js';
 
 export default class Event {
   constructor(eventsListElement, changeData, changeMode, destinations, offers) {
@@ -15,7 +17,7 @@ export default class Event {
     this._offers = offers;
     this._destinations = destinations;
 
-    this._mode = MODE.DEFAULT;
+    this._mode = Mode.DEFAULT;
 
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
@@ -51,12 +53,11 @@ export default class Event {
       return;
     }
 
-    if (this._mode === MODE.DEFAULT) {
+    if (this._mode === Mode.DEFAULT) {
       replace(this._eventItemComponent, prevItemComponent);
     }
 
-    if (this._mode === MODE.EDITING) {
-      // replace(this._eventFormComponent, prevFormComponent);
+    if (this._mode === Mode.EDITING) {
       replace(this._eventItemComponent, prevFormComponent);
     }
 
@@ -64,26 +65,19 @@ export default class Event {
     remove(prevFormComponent);
   }
 
-  resetView() {
-    if (this._mode !== MODE.DEFAULT) {
-      this._replaceFormToItem();
-    }
-  }
-
   destroy() {
     remove(this._eventItemComponent);
     remove(this._eventFormComponent);
   }
 
-  setSaving() {
-    this._eventFormComponent.updateData({
-      isDisabled: true,
-      isSaving: true,
-    });
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._replaceFormToItem();
+    }
   }
 
   setViewState(state) {
-    if (this._mode === MODE.DEFAULT) {
+    if (this._mode === Mode.DEFAULT) {
       return;
     }
 
@@ -96,36 +90,46 @@ export default class Event {
     };
 
     switch (state) {
-      case FORM_STATE.SAVING:
+      case FormState.SAVING:
         this._eventFormComponent.updateData({
           isDisabled: true,
           isSaving: true,
         });
         break;
-      case FORM_STATE.DELETING:
+      case FormState.DELETING:
         this._eventFormComponent.updateData({
           isDisabled: true,
           isDeleting: true,
         });
         break;
-      case FORM_STATE.ABORTING:
+      case FormState.ABORTING:
         this._eventFormComponent.shake(resetFormState);
         this._eventItemComponent.shake(resetFormState);
 
     }
   }
 
+  setSaving() {
+    this._eventFormComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
   _replaceItemToForm() {
+    this._eventFormComponent.setEditCloseCLickHandler(this._handleCloseEditClick);
     replace(this._eventFormComponent, this._eventItemComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
+    this._eventFormComponent.restoreHandlers();
     this._changeMode();
-    this._mode = MODE.EDITING;
+    this._mode = Mode.EDITING;
   }
 
   _replaceFormToItem() {
     replace(this._eventItemComponent, this._eventFormComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
-    this._mode = MODE.DEFAULT;
+    this._eventFormComponent.removeHandlers();
+    this._mode = Mode.DEFAULT;
   }
 
   _escKeyDownHandler(evt) {
@@ -138,6 +142,11 @@ export default class Event {
   }
 
   _handleEditClick() {
+    if (!isOnline()) {
+      toast('You can\'t edit event offline');
+      return;
+    }
+
     this._replaceItemToForm();
   }
 
@@ -147,8 +156,8 @@ export default class Event {
 
   _handleFavoriteClick() {
     this._changeData(
-      USER_ACTION.UPDATE_EVENT,
-      UPDATE_TYPE.PATCH,
+      UserAction.UPDATE_EVENT,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._event,
@@ -168,19 +177,29 @@ export default class Event {
   }
 
   _handleFormSubmit(update) {
+    if (!isOnline()) {
+      toast('You can\'t save event offline');
+      return;
+    }
+
     // Здесь вызывается метод _handleViewAction
     this._changeData(
-      USER_ACTION.UPDATE_EVENT,
-      UPDATE_TYPE.MAJOR,
+      UserAction.UPDATE_EVENT,
+      UpdateType.MAJOR,
       update,
     );
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _deleteClickHandler(event) {
+    if (!isOnline()) {
+      toast('You can\'t delete event offline');
+      return;
+    }
+
     this._changeData(
-      USER_ACTION.DELETE_EVENT,
-      UPDATE_TYPE.MAJOR,
+      UserAction.DELETE_EVENT,
+      UpdateType.MAJOR,
       event,
     );
   }

@@ -1,22 +1,33 @@
-import TripPresenter from './presenter/trip.js';
+import Api from './api/api.js';
+import Store from './api/store.js';
+import Provider from './api/provider.js';
 import EventsModel from './model/events.js';
 import FilterModel from './model/filter.js';
+import TripPresenter from './presenter/trip.js';
+import TripInfoPresenter from './presenter/trip-info.js';
 import FilterPresenter from './presenter/filter.js';
-import { MENU_ITEM } from './const/const.js';
 import SiteMenuView from './view/site-menu.js';
-import { RenderPosition, render, remove } from './utils/render.js';
 import StatisticsView from './view/statistics.js';
 import AddNewEventView from './view/site-add-new-event.js';
-import Api from './api/api.js';
-import TripInfoPresenter from './presenter/trip-info.js';
+import { MenuItem } from './const/const.js';
+import { RenderPosition, render, remove } from './utils/render.js';
+import { isOnline } from './utils/common.js';
+import { toast } from './utils/toast.js';
+
 
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip/';
-const AUTHORIZATION = 'Basic 8k69hjl853avfr5593';
+const AUTHORIZATION = 'Basic 8k6936776av3fr5554';
+const STORE_PREFIX = 'bigtrip-localstorage';
+const STORE_VER = 'v15';
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+
 const api = new Api(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const pageBodyContainerElement = document.querySelector('main .page-body__container');
 const siteTripMainElement = document.querySelector('.trip-main');
-const siteTripEvents = document.querySelector('.trip-events');
+const siteTripEventsElement = document.querySelector('.trip-events');
 // Model
 const eventsModel = new EventsModel();
 const filterModel = new FilterModel();
@@ -29,23 +40,27 @@ const filterPresenter = new FilterPresenter(
 filterPresenter.init();
 
 let statiscticsComponent = null;
-const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEvents, eventsModel, filterModel, api, statiscticsComponent);
 
 const siteMenuComponent = new SiteMenuView();
+const addNewEventButtonComponent = new AddNewEventView();
+render(siteTripMainElement, addNewEventButtonComponent, RenderPosition.BEFOREEND);
+const tripPresenter = new TripPresenter(siteTripMainElement, siteTripEventsElement, eventsModel, filterModel, apiWithProvider, addNewEventButtonComponent);
 
 const handleAddNewEventButtonClick = () => {
-  siteMenuComponent.setActiveMenuItem(MENU_ITEM.EVENTS);
+  siteMenuComponent.setActiveMenuItem(MenuItem.EVENTS);
+  if (!isOnline()) {
+    toast('You can\'t create new trip event offline');
+    return;
+  }
   tripPresenter.createEvent();
   remove(statiscticsComponent);
 };
 
-const addNewEventButtonComponent = new AddNewEventView();
-render(siteTripMainElement, addNewEventButtonComponent, RenderPosition.BEFOREEND);
-addNewEventButtonComponent.setAddNewButtonClickHabdler(handleAddNewEventButtonClick);
+addNewEventButtonComponent.setAddNewButtonClickHandler(handleAddNewEventButtonClick);
 
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
-    case MENU_ITEM.EVENTS:
+    case MenuItem.EVENTS:
       // Показать все точки маршрута
       if (tripPresenter.isHidden) {
         tripPresenter.init();
@@ -54,7 +69,7 @@ const handleSiteMenuClick = (menuItem) => {
       }
 
       break;
-    case MENU_ITEM.STATISTICS:
+    case MenuItem.STATISTICS:
       siteMenuComponent.setActiveMenuItem(menuItem);
       // Скрыть точки маршрута
       tripPresenter.destroy();
@@ -69,7 +84,7 @@ const handleSiteMenuClick = (menuItem) => {
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 const tripInfoPresenter = new TripInfoPresenter(siteTripMainElement, eventsModel);
 
-api.getData()
+apiWithProvider.getData()
   .then((serverData) => {
     eventsModel.setDestinations(serverData.destinations);
     eventsModel.setOffers(serverData.offers);
@@ -86,3 +101,16 @@ api.getData()
     tripPresenter.init();
     tripInfoPresenter.init();
   });
+
+window.addEventListener('load', () => {
+  navigator.serviceWorker.register('/sw.js');
+});
+
+window.addEventListener('online', () => {
+  document.title = document.title.replace(' [offline]', '');
+  apiWithProvider.sync();
+});
+
+window.addEventListener('offline', () => {
+  document.title += ' [offline]';
+});
